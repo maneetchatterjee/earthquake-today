@@ -1,0 +1,49 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Sidebar from '@/components/Sidebar';
+
+export default function ClientLayout({ children }: { children: React.ReactNode }) {
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('sidebar-collapsed');
+      if (stored !== null) setCollapsed(stored === 'true');
+    } catch {}
+  }, []);
+
+  const handleToggle = () => {
+    const next = !collapsed;
+    setCollapsed(next);
+    try { localStorage.setItem('sidebar-collapsed', String(next)); } catch {}
+  };
+
+  return (
+    <div className="flex min-h-screen">
+      {/* Hamburger for mobile */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="fixed top-4 left-4 z-40 lg:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 backdrop-blur-xl border border-white/10 text-white"
+      >
+        ☰
+      </button>
+
+      <Sidebar
+        collapsed={collapsed}
+        onToggle={handleToggle}
+        mobileOpen={mobileOpen}
+        onMobileClose={() => setMobileOpen(false)}
+      />
+
+      <main
+        className={`flex-1 transition-all duration-300 min-h-screen ${
+          collapsed ? 'lg:ml-16' : 'lg:ml-64'
+        }`}
+      >
+        {children}
+      </main>
+    </div>
+  );
+}

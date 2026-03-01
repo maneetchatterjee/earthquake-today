@@ -1,20 +1,23 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import ClientLayout from './ClientLayout';
 
 export const metadata: Metadata = {
-  title: 'Earthquakes Today | Real-time Global Seismic Activity',
+  title: 'Earth Monitor | Real-time Global Earth Monitoring',
   description:
-    'Real-time earthquake monitoring dashboard. Live data from USGS Earthquake Hazards Program. Track earthquakes worldwide with interactive maps, charts, and statistics.',
-  keywords: ['earthquake', 'seismic', 'USGS', 'real-time', 'monitoring', 'map'],
+    'Real-time Earth monitoring platform. Track earthquakes, weather, air quality, wildfires, oceans, space activity and more.',
+  keywords: ['earthquake', 'weather', 'air quality', 'wildfire', 'earth monitor', 'real-time', 'monitoring'],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
-        <script dangerouslySetInnerHTML={{
-          __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}}catch(e){}})();`
-        }} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}}catch(e){}})();`,
+          }}
+        />
         <link
           rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -22,8 +25,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           crossOrigin="anonymous"
         />
       </head>
-      <body className="bg-gray-950 text-gray-100 min-h-screen">
-        {children}
+      <body className="bg-[#0A0E1A] text-slate-100 min-h-screen">
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );
