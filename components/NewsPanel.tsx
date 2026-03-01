@@ -17,7 +17,7 @@ const SOURCE_COLORS: Record<NewsArticle['source'], string> = {
   ReliefWeb: 'bg-orange-700 text-orange-200',
 };
 
-const BREAKING_NEWS_THRESHOLD_MS = 3600000; // 1 hour
+const BREAKING_NEWS_THRESHOLD_MS = 60 * 60 * 1000; // 1 hour
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();

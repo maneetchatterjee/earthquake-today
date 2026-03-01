@@ -47,7 +47,6 @@ export function useAirQualityData() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchAll = useCallback(async () => {
-    setLoading(true);
     const results = await Promise.all(CITIES.map(fetchCityAQI));
     setAqiData(results);
     setLastUpdated(new Date());
@@ -55,6 +54,7 @@ export function useAirQualityData() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchAll();
     const interval = setInterval(fetchAll, REFRESH_INTERVAL);
     return () => clearInterval(interval);

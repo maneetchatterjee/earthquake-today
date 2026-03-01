@@ -12,6 +12,13 @@ interface Counter {
   methodology: string;
 }
 
+function formatCounterValue(value: number): string {
+  if (value >= 1e9) return `${(value / 1e9).toFixed(3)}B`;
+  if (value >= 1e6) return `${(value / 1e6).toFixed(3)}M`;
+  if (value >= 1e3) return `${(value / 1e3).toFixed(3)}K`;
+  return value.toFixed(2);
+}
+
 const ANNUAL_RATES = {
   co2Gt: 40,
   forestHa: 6.8e6,
@@ -108,13 +115,7 @@ export default function EnvironmentCounters() {
               <span>{c.label}</span>
             </div>
             <div className={`text-2xl font-bold font-mono tabular-nums ${c.color}`}>
-              {c.value >= 1e9
-                ? `${(c.value / 1e9).toFixed(3)}B`
-                : c.value >= 1e6
-                ? `${(c.value / 1e6).toFixed(3)}M`
-                : c.value >= 1e3
-                ? `${(c.value / 1e3).toFixed(3)}K`
-                : c.value.toFixed(2)}
+              {formatCounterValue(c.value)}
             </div>
             <div className="text-gray-500 text-xs">{c.unit}</div>
             <div className="text-gray-500 text-xs border-t border-gray-700 pt-2" title={c.methodology}>

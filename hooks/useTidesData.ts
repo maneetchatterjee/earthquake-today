@@ -30,7 +30,6 @@ export function useTidesData() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchAll = useCallback(async () => {
-    setLoading(true);
     const results = await Promise.all(TIDE_STATIONS.map(fetchTidePredictions));
     const map: Record<string, TidePrediction[]> = {};
     TIDE_STATIONS.forEach((s, i) => { map[s.id] = results[i]; });
@@ -40,6 +39,7 @@ export function useTidesData() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchAll();
     const interval = setInterval(fetchAll, REFRESH_INTERVAL);
     return () => clearInterval(interval);

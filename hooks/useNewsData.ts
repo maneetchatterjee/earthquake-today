@@ -40,7 +40,6 @@ export function useNewsData() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchAll = useCallback(async () => {
-    setLoading(true);
     const results = await Promise.all(RSS_SOURCES.map(fetchRSS));
     const all = results.flat().sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
     setArticles(all.slice(0, 30));
@@ -49,6 +48,7 @@ export function useNewsData() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchAll();
     const interval = setInterval(fetchAll, REFRESH_INTERVAL);
     return () => clearInterval(interval);

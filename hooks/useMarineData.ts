@@ -57,7 +57,6 @@ export function useMarineData() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchAll = useCallback(async () => {
-    setLoading(true);
     const results = await Promise.all(OCEAN_POINTS.map(fetchMarinePoint));
     setMarineData(results);
     setLastUpdated(new Date());
@@ -65,6 +64,7 @@ export function useMarineData() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchAll();
     const interval = setInterval(fetchAll, REFRESH_INTERVAL);
     return () => clearInterval(interval);

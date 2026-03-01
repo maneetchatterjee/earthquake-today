@@ -61,12 +61,13 @@ export default function AirQualityPanel({ aqiData, loading }: AirQualityPanelPro
   const worst = valid.length ? valid.reduce((a, b) => (a.usAqi > b.usAqi ? a : b)) : null;
 
   const categoryCounts = AQI_CATEGORIES.map((cat) => {
-    const [min, maxStr] = cat.range.split('-');
-    const minV = parseInt(min);
-    const maxV = maxStr === undefined ? Infinity : parseInt(maxStr.replace('+', '')) + 1;
+    const isOpenEnded = cat.range.endsWith('+');
+    const [minStr, maxStr] = cat.range.replace('+', '').split('-');
+    const minV = parseInt(minStr);
+    const maxV = isOpenEnded ? Infinity : parseInt(maxStr) + 1;
     return {
       ...cat,
-      count: valid.filter((d) => d.usAqi >= minV && d.usAqi < (maxStr?.includes('+') ? Infinity : maxV)).length,
+      count: valid.filter((d) => d.usAqi >= minV && d.usAqi < maxV).length,
     };
   });
 

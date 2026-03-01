@@ -5,6 +5,12 @@ import { WeatherData, City } from '@/lib/types';
 
 const REFRESH_INTERVAL = 300000;
 
+interface WeatherState {
+  weatherData: WeatherData[];
+  loading: boolean;
+  lastUpdated: Date | null;
+}
+
 async function fetchCityWeather(city: City): Promise<WeatherData> {
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=auto`;
@@ -50,23 +56,27 @@ async function fetchCityWeather(city: City): Promise<WeatherData> {
 }
 
 export function useWeatherData() {
-  const [weatherData, setWeatherData] = useState<WeatherData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [state, setState] = useState<WeatherState>({
+    weatherData: [],
+    loading: true,
+    lastUpdated: null,
+  });
 
   const fetchAll = useCallback(async () => {
-    setLoading(true);
-    const results = await Promise.all(CITIES.map(fetchCityWeather));
-    setWeatherData(results);
-    setLastUpdated(new Date());
-    setLoading(false);
+    try {
+      const results = await Promise.all(CITIES.map(fetchCityWeather));
+      setState({ weatherData: results, loading: false, lastUpdated: new Date() });
+    } catch {
+      setState((prev) => ({ ...prev, loading: false }));
+    }
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchAll();
     const interval = setInterval(fetchAll, REFRESH_INTERVAL);
     return () => clearInterval(interval);
   }, [fetchAll]);
 
-  return { weatherData, loading, lastUpdated };
+  return state;
 }

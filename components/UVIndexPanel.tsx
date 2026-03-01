@@ -75,13 +75,13 @@ export default function UVIndexPanel() {
   const [loading, setLoading] = useState(true);
 
   const fetchAll = useCallback(async () => {
-    setLoading(true);
     const results = await Promise.all(CITIES.map(fetchUV));
     setUvData(results);
     setLoading(false);
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchAll();
   }, [fetchAll]);
 
