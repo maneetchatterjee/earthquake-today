@@ -107,6 +107,15 @@ export default function OverviewPage() {
     { label: 'Monitoring Since', value: '2024', unit: '', icon: '📡', color: '#00FFFF', href: '/records' },
   ];
 
+  const healthStatus =
+    healthScore >= 70
+      ? { label: 'Conditions Normal', tone: 'text-green-400 border-green-500/30 bg-green-500/20', icon: '✅' }
+      : healthScore >= 40
+        ? { label: 'Elevated Risk Signals', tone: 'text-amber-400 border-amber-500/30 bg-amber-500/20', icon: '⚠️' }
+        : { label: 'Critical Conditions', tone: 'text-red-400 border-red-500/30 bg-red-500/20', icon: '🚨' };
+
+  const topEarthquake = day[0];
+
   return (
     <div className="min-h-screen bg-[#0A0E1A] relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 opacity-70 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.24),transparent_34%),radial-gradient(circle_at_84%_12%,rgba(168,85,247,0.2),transparent_26%),radial-gradient(circle_at_50%_100%,rgba(16,185,129,0.16),transparent_32%)]" />
