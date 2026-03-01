@@ -14,10 +14,10 @@ export default function Header({ lastUpdated, loading }: HeaderProps) {
       <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
-            🌍 <span className="text-orange-400">Earthquakes</span>{' '}
-            <span className="text-white">Today</span>
+            🌍 <span className="text-orange-400">Earth</span>{' '}
+            <span className="text-white">Monitor</span>
           </h1>
-          <p className="text-gray-400 text-sm">Real-time global seismic activity</p>
+          <p className="text-gray-400 text-sm">Live earthquake, weather, air quality, wildfire, ocean, and climate data</p>
         </div>
         <div className="flex items-center gap-3">
           {loading && (
