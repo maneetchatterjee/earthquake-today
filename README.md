@@ -1,32 +1,78 @@
-# 🌍 Earthquakes Today
+# 🌍 Earth Monitor
 
-A real-time global earthquake monitoring dashboard built with **Next.js 16+**, **Tailwind CSS**, **Leaflet**, and **Recharts**. Inspired by Worldometer, this dashboard shows live seismic activity from the **USGS Earthquake Hazards Program**.
+A real-time global **Environmental Monitoring Suite** built with **Next.js 16+**, **Tailwind CSS**, **Leaflet**, and **Recharts**. Tracks earthquakes, weather, air quality, wildfires, ocean conditions, UV index, environmental counters, and environmental news.
 
 ## Features
 
-### Core Features
+### 🌋 Earthquake Monitoring (original)
 - 🔴 **Live counters** — animated Worldometer-style cards for today, this hour, this week, this month
 - 🗺️ **Interactive world map** — earthquake positions with depth-coded colors and magnitude-sized circles
 - 📊 **Charts & analytics** — magnitude distribution, hourly activity, depth distribution, magnitude vs depth scatter
 - 📋 **Live earthquake table** — sortable, filterable, paginated table of all recent events
-- 📈 **Magnitude breakdown** — bar chart + counter rows for all magnitude ranges
-- 📋 **Statistics summary** — deepest, shallowest, average depth, regions affected, total seismic energy
-- ♻️ **Auto-refresh every 60 seconds**
-- 🌙 **Dark seismic theme**
+- 🌊 **Tsunami Warning Panel**, 🌋 **Volcano Alerts**, 🌐 **3D Globe View**, 🤖 **AI Summary**
 
-### New Features
-- 🌍 **Tectonic Plate Boundaries** — toggleable GeoJSON overlay on the map showing major plate boundaries with orange polylines
-- 🔔 **EEW Banner** — real-time Early Earthquake Warning alerts from Wolfx Open API (JMA), shown as an animated red banner when M4+ warnings are detected
-- 📜 **Historical Earthquake Search** — search the USGS FDSN Event API by date range and magnitude; results shown in the earthquake table
-- 🌊 **Tsunami Warning Panel** — dedicated section showing tsunami-flagged earthquakes with severity color coding; green "all clear" when none active
-- 📊 **Earthquake Impact Score** — composite score (0–100) based on magnitude, depth, and USGS significance rating; color-coded Low/Moderate/High/Critical badges
-- 🔥 **Heatmap View** — toggle between Markers, Heatmap, and Both views on the map using `leaflet.heat`
-- 📈 **Trend Analysis** — compares today's activity vs. the 30-day daily average with ↑↓→ indicators and a 24h area chart
-- 🗺️ **Region Dashboard** — dropdown selector for 10 major seismic zones (Japan, Alaska, California, Chile, Indonesia, Mediterranean, etc.); filters map and table
-- 🌙 **Light/Dark Theme** — sun/moon toggle in the header; persisted in `localStorage`; inline script prevents flash of unstyled content
-- 🌐 **3D Globe View** — `globe.gl`-powered interactive 3D globe with magnitude altitude, depth-colored points, auto-rotation, and pause on hover
-- 🤖 **AI-Powered Summary** — template-based daily natural language summary of seismic activity with copy-to-clipboard button
-- 🌋 **Volcano Proximity Alerts** — 98 active volcanoes dataset; alerts when M4+ earthquakes occur within 100km of a volcano; HIGH ALERT badge for M5+/50km
+### 🌡️ Weather Dashboard
+- Live weather for 20 major cities via **Open-Meteo**
+- Temperature (°C/°F toggle), humidity, wind speed/direction, precipitation, cloud cover, pressure
+- Summary cards: hottest, coldest, rainiest, windiest city
+- ⚠️ **Severe Weather Alerts** — thunderstorms, high winds, extreme heat/cold, heavy rain/snow
+
+### 💨 Air Quality
+- US AQI and European AQI for all 20 cities
+- Sortable table with AQI color bars
+- Category breakdown counter grid
+- Best/worst city highlighted
+
+### 🔥 Wildfire Tracker
+- NASA FIRMS VIIRS satellite fire detection data
+- Fire detection table with brightness, FRP, confidence
+
+### 🌊 Oceans & Tides
+- **NOAA CO-OPS tide predictions** for 10 US stations with Recharts LineChart
+- **Marine conditions** (wave height, swell, direction, period) for 10 ocean regions
+
+### ☀️ UV Index
+- Current UV index for all 20 cities with color-coded safety recommendations
+
+### 🌍 Environmental Counters
+- Real-time Worldometer-style counters: CO₂ emitted, forest lost, land desertified, water used, waste dumped today
+
+### 📰 Environmental News
+- RSS feeds from NASA Earth Observatory, ReliefWeb, UN Climate Change, The Guardian
+- Filter by source, breaking news ticker
+
+## Environment Variables
+
+```env
+NEXT_PUBLIC_FIRMS_MAP_KEY=your_nasa_firms_api_key  # optional, enables wildfire data
+```
+
+Get a free NASA FIRMS API key at: https://firms.modaps.eosdis.nasa.gov/api/area/
+
+## Setup
+
+```bash
+npm install
+cp .env.local.example .env.local  # add NEXT_PUBLIC_FIRMS_MAP_KEY if desired
+npm run dev
+```
+
+## API Attributions
+
+- **USGS** — Earthquake data (https://earthquake.usgs.gov)
+- **Open-Meteo** — Weather, Air Quality, Marine, UV index (https://open-meteo.com)
+- **NASA FIRMS** — Wildfire detection (https://firms.modaps.eosdis.nasa.gov)
+- **NOAA CO-OPS** — Tide predictions (https://tidesandcurrents.noaa.gov)
+- **RSS2JSON** — RSS feed proxy (https://rss2json.com)
+
+## Tech Stack
+
+- Next.js 16, TypeScript, Tailwind CSS v4
+- Recharts (charts), React-Leaflet (maps), Globe.gl (3D globe)
+
+## License
+
+MIT
 
 ## Tech Stack
 
