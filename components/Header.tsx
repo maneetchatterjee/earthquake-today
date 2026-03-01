@@ -1,6 +1,7 @@
 'use client';
 
 import { formatTimeAgo } from '@/lib/utils';
+import ThemeToggle from './ThemeToggle';
 
 interface HeaderProps {
   lastUpdated: Date | null;
@@ -35,6 +36,7 @@ export default function Header({ lastUpdated, loading }: HeaderProps) {
             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
             <span className="text-green-400 text-xs font-medium">LIVE</span>
           </div>
+          <ThemeToggle />
         </div>
       </div>
     </header>
