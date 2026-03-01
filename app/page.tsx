@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useEarthquakeData } from '@/hooks/useEarthquakeData';
 import { useWeatherData } from '@/hooks/useWeatherData';
@@ -59,24 +58,33 @@ export default function OverviewPage() {
     { label: 'Monitoring Since', value: '2024', unit: '', icon: '📡', color: '#00FFFF', href: '/records' },
   ];
 
+  const healthStatus =
+    healthScore >= 70
+      ? { label: 'Conditions Normal', tone: 'text-green-400 border-green-500/30 bg-green-500/20', icon: '✅' }
+      : healthScore >= 40
+        ? { label: 'Some Concerns', tone: 'text-amber-400 border-amber-500/30 bg-amber-500/20', icon: '⚠️' }
+        : { label: 'Critical Conditions', tone: 'text-red-400 border-red-500/30 bg-red-500/20', icon: '🚨' };
+
   return (
-    <div className="min-h-screen bg-[#0A0E1A]">
+    <div className="min-h-screen bg-[#0A0E1A] relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 opacity-60 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.22),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.2),transparent_25%),radial-gradient(circle_at_50%_100%,rgba(16,185,129,0.15),transparent_28%)]" />
       <EEWBanner />
-      <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+      <main className="relative max-w-7xl mx-auto px-4 py-8 space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-xl p-6 md:p-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between shadow-[0_20px_80px_rgba(0,0,0,0.35)]">
+          <div className="space-y-3">
+            <p className="inline-flex items-center rounded-full border border-cyan-400/30 bg-cyan-400/10 text-cyan-300 text-xs px-3 py-1 tracking-wide">Global live dashboard</p>
             <h1 className="text-4xl font-bold text-white">🌍 Earth Monitor</h1>
-            <p className="text-slate-400 mt-1">Real-time global Earth monitoring platform</p>
+            <p className="text-slate-300 max-w-2xl">Understand seismic risk, atmospheric trends, climate stress signals, and global alerts at a glance.</p>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-red-500 animate-live-pulse" />
-            <span className="text-red-400 font-bold text-sm tracking-widest">LIVE</span>
+          <div className="flex items-center gap-3 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 self-start md:self-auto">
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-live-pulse" />
+            <span className="text-emerald-300 font-bold text-sm tracking-widest">LIVE UPDATES</span>
           </div>
         </div>
 
         {/* Earth Health Score */}
-        <GlassCard className="p-8">
+        <GlassCard className="p-8 border border-white/15">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="flex-shrink-0">
               <RadialGauge
@@ -97,10 +105,14 @@ export default function OverviewPage() {
               <p className="text-slate-400 mb-4">
                 Composite score based on seismic activity, air quality, temperature anomalies, wildfires, and carbon emissions.
               </p>
+              <div className="w-full h-2 rounded-full bg-white/10 mb-4 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-red-500 via-amber-400 to-emerald-400 transition-all duration-700"
+                  style={{ width: `${Math.min(100, Math.max(0, healthScore))}%` }}
+                />
+              </div>
               <div className="flex flex-wrap gap-2">
-                {healthScore >= 70 && <span className="bg-green-500/20 text-green-400 border border-green-500/30 rounded-full px-3 py-1 text-sm">✅ Conditions Normal</span>}
-                {healthScore < 70 && healthScore >= 40 && <span className="bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full px-3 py-1 text-sm">⚠️ Some Concerns</span>}
-                {healthScore < 40 && <span className="bg-red-500/20 text-red-400 border border-red-500/30 rounded-full px-3 py-1 text-sm">🚨 Critical Conditions</span>}
+                <span className={`border rounded-full px-3 py-1 text-sm ${healthStatus.tone}`}>{healthStatus.icon} {healthStatus.label}</span>
                 <span className="bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full px-3 py-1 text-sm">📡 Live Data</span>
               </div>
             </div>
@@ -110,8 +122,8 @@ export default function OverviewPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {stats.map((stat) => (
-            <Link key={stat.label} href={stat.href}>
-              <GlassCard className="p-4 cursor-pointer">
+            <Link key={stat.label} href={stat.href} className="group">
+              <GlassCard className="p-4 cursor-pointer border border-white/5 group-hover:border-white/20 transition-all duration-200 group-hover:-translate-y-1">
                 <div className="text-2xl mb-2">{stat.icon}</div>
                 <div className="text-2xl font-bold font-mono" style={{ color: stat.color }}>
                   {stat.value}{stat.unit}
@@ -127,8 +139,8 @@ export default function OverviewPage() {
           <h2 className="text-white font-semibold text-xl mb-4">🔗 Quick Access</h2>
           <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
             {MODULE_LINKS.map((mod) => (
-              <Link key={mod.href} href={mod.href}>
-                <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-4 text-center hover:bg-white/10 transition-all duration-200 cursor-pointer">
+              <Link key={mod.href} href={mod.href} className="group">
+                <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-4 text-center hover:bg-white/10 transition-all duration-200 cursor-pointer group-hover:-translate-y-1 group-hover:border-white/30">
                   <div className="text-3xl mb-2">{mod.icon}</div>
                   <div className="text-xs text-slate-300 font-medium">{mod.label}</div>
                 </div>
