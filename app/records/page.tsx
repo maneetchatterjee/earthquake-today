@@ -65,7 +65,7 @@ export default function RecordsPage() {
 
         {/* Daily Records */}
         <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6">
-          <h2 className="text-white font-semibold text-xl mb-4">📊 Today&apos;s Records</h2>
+          <h2 className="text-white font-semibold text-xl mb-4">📊 Today's Records</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="bg-white/5 rounded-xl p-4">
               <div className="text-slate-400 text-xs">Largest Earthquake</div>

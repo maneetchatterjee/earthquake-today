@@ -68,12 +68,15 @@ export default function HumanPage() {
 
         {/* Internet stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: 'Emails Sent Today', value: Math.round((Date.now() - new Date(new Date().setHours(0,0,0,0)).getTime()) / 1000 * 3400000).toLocaleString(), icon: '📧' },
-            { label: 'Google Searches Today', value: Math.round((Date.now() - new Date(new Date().setHours(0,0,0,0)).getTime()) / 1000 * 100000).toLocaleString(), icon: '🔍' },
-            { label: 'Tweets Today', value: Math.round((Date.now() - new Date(new Date().setHours(0,0,0,0)).getTime()) / 1000 * 6000).toLocaleString(), icon: '🐦' },
-            { label: 'YouTube Videos Watched', value: Math.round((Date.now() - new Date(new Date().setHours(0,0,0,0)).getTime()) / 1000 * 80000).toLocaleString(), icon: '▶️' },
-          ].map((stat) => (
+          {(() => {
+            const secondsToday = (Date.now() - new Date(new Date().setHours(0,0,0,0)).getTime()) / 1000;
+            return [
+              { label: 'Emails Sent Today', value: Math.round(secondsToday * 3400000).toLocaleString(), icon: '📧' },
+              { label: 'Google Searches Today', value: Math.round(secondsToday * 100000).toLocaleString(), icon: '🔍' },
+              { label: 'Tweets Today', value: Math.round(secondsToday * 6000).toLocaleString(), icon: '🐦' },
+              { label: 'YouTube Videos Watched', value: Math.round(secondsToday * 80000).toLocaleString(), icon: '▶️' },
+            ];
+          })().map((stat) => (
             <div key={stat.label} className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
               <div className="text-3xl mb-2">{stat.icon}</div>
               <div className="text-lg font-bold text-white font-mono">{stat.value}</div>
