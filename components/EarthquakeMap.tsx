@@ -10,6 +10,16 @@ interface EarthquakeMapProps {
 
 type ViewMode = 'markers' | 'heatmap' | 'both';
 
+function getTileLayer(L: typeof import('leaflet'), isDark: boolean) {
+  return isDark
+    ? L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap © CARTO',
+      })
+    : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+      });
+}
+
 export default function EarthquakeMap({ features }: EarthquakeMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,6 +30,8 @@ export default function EarthquakeMap({ features }: EarthquakeMapProps) {
   const plateLayerRef = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const heatLayerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tileLayerRef = useRef<any>(null);
 
   const [showPlates, setShowPlates] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('markers');
@@ -38,15 +50,9 @@ export default function EarthquakeMap({ features }: EarthquakeMapProps) {
         minZoom: 1,
       });
 
-      const tileLayer = isDark
-        ? L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap © CARTO',
-          })
-        : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-          });
-
-      tileLayer.addTo(map);
+      const tile = getTileLayer(L, isDark);
+      tile.addTo(map);
+      tileLayerRef.current = tile;
       mapInstanceRef.current = map;
       layerGroupRef.current = L.layerGroup().addTo(map);
 
@@ -69,6 +75,22 @@ export default function EarthquakeMap({ features }: EarthquakeMapProps) {
         return div;
       };
       legend.addTo(map);
+
+      // Listen for theme changes (MutationObserver on html class)
+      const observer = new MutationObserver(() => {
+        if (!mapInstanceRef.current) return;
+        import('leaflet').then((Lm) => {
+          if (tileLayerRef.current) {
+            mapInstanceRef.current.removeLayer(tileLayerRef.current);
+          }
+          const newDark = document.documentElement.classList.contains('dark');
+          tileLayerRef.current = getTileLayer(Lm, newDark);
+          tileLayerRef.current.addTo(mapInstanceRef.current);
+          if (layerGroupRef.current) layerGroupRef.current.bringToFront();
+          if (plateLayerRef.current) plateLayerRef.current.bringToFront();
+        });
+      });
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     });
   }, []);
 
