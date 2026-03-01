@@ -11,13 +11,19 @@ export default function LanguageSelector() {
     try {
       const stored = localStorage.getItem('language') as Language;
       if (stored && stored in LANGUAGES) setLang(stored);
-    } catch {}
+    } catch (e) {
+      console.warn('Could not read language preference from localStorage:', e);
+    }
   }, []);
 
   const handleSelect = (l: Language) => {
     setLang(l);
     setOpen(false);
-    try { localStorage.setItem('language', l); } catch {}
+    try {
+      localStorage.setItem('language', l);
+    } catch (e) {
+      console.warn('Could not save language preference to localStorage:', e);
+    }
   };
 
   return (

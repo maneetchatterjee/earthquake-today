@@ -20,6 +20,8 @@ interface AsteroidData {
   error: string | null;
 }
 
+// DEMO_KEY has a rate limit of 30 req/hour and 50 req/day.
+// Set NEXT_PUBLIC_NASA_API_KEY env var for production use (free at https://api.nasa.gov/).
 const NASA_KEY = process.env.NEXT_PUBLIC_NASA_API_KEY || 'DEMO_KEY';
 
 export function useAsteroidData(): AsteroidData {

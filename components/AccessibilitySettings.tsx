@@ -24,7 +24,9 @@ export default function AccessibilitySettings() {
         setSettings(parsed);
         applySettings(parsed);
       }
-    } catch {}
+    } catch (e) {
+      console.warn('Could not read accessibility settings from localStorage:', e);
+    }
   }, []);
 
   const applySettings = (s: A11ySettings) => {
@@ -38,7 +40,11 @@ export default function AccessibilitySettings() {
     const next = { ...settings, [key]: !settings[key] };
     setSettings(next);
     applySettings(next);
-    try { localStorage.setItem('a11y-settings', JSON.stringify(next)); } catch {}
+    try {
+      localStorage.setItem('a11y-settings', JSON.stringify(next));
+    } catch (e) {
+      console.warn('Could not save accessibility settings to localStorage:', e);
+    }
   };
 
   return (

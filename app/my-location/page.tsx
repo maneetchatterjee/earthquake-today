@@ -76,13 +76,13 @@ export default function MyLocationPage() {
           precipitation: c.precipitation,
         });
       })
-      .catch(() => {});
+      .catch((e) => console.warn('Could not fetch local weather:', e));
 
     // Fetch AQI
     fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&current=us_aqi&timezone=auto`)
       .then(r => r.json())
       .then(d => setAqi(d.current?.us_aqi ?? null))
-      .catch(() => {});
+      .catch((e) => console.warn('Could not fetch local AQI:', e));
 
     // Fetch nearby earthquakes
     const minLat = lat - 5, maxLat = lat + 5, minLng = lng - 5, maxLng = lng + 5;
@@ -98,13 +98,13 @@ export default function MyLocationPage() {
           time: f.properties.time,
         })));
       })
-      .catch(() => {});
+      .catch((e) => console.warn('Could not fetch nearby earthquakes:', e));
 
     // Reverse geocode
     fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
       .then(r => r.json())
       .then(d => setLocationName(d.display_name?.split(',').slice(0, 3).join(', ') || ''))
-      .catch(() => {});
+      .catch((e) => console.warn('Could not reverse geocode location:', e));
   }, [location]);
 
   return (

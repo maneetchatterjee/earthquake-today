@@ -54,7 +54,9 @@ export function useISSData(): ISSData {
         setAstronauts(data.people);
         setPeopleInSpace(data.number || data.people.length);
       }
-    } catch {}
+    } catch (e) {
+      console.warn('Could not fetch astronaut data:', e);
+    }
   }, []);
 
   useEffect(() => {

@@ -11,13 +11,19 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     try {
       const stored = localStorage.getItem('sidebar-collapsed');
       if (stored !== null) setCollapsed(stored === 'true');
-    } catch {}
+    } catch (e) {
+      console.warn('Could not read sidebar state from localStorage:', e);
+    }
   }, []);
 
   const handleToggle = () => {
     const next = !collapsed;
     setCollapsed(next);
-    try { localStorage.setItem('sidebar-collapsed', String(next)); } catch {}
+    try {
+      localStorage.setItem('sidebar-collapsed', String(next));
+    } catch (e) {
+      console.warn('Could not save sidebar state to localStorage:', e);
+    }
   };
 
   return (
