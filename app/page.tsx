@@ -11,9 +11,15 @@ import MagnitudeBreakdown from '@/components/MagnitudeBreakdown';
 import EarthquakeTable from '@/components/EarthquakeTable';
 import Charts from '@/components/Charts';
 import StatsPanel from '@/components/StatsPanel';
+import TsunamiPanel from '@/components/TsunamiPanel';
+import AISummary from '@/components/AISummary';
+import TrendAnalysis from '@/components/TrendAnalysis';
+import RegionDashboard from '@/components/RegionDashboard';
+import HistoricalSearch from '@/components/HistoricalSearch';
+import VolcanoAlerts from '@/components/VolcanoAlerts';
+import { filterByRegion } from '@/lib/regions';
 import { TimePeriod } from '@/lib/types';
 
-// Dynamic import for map (no SSR - Leaflet requirement)
 const EarthquakeMap = dynamic(() => import('@/components/EarthquakeMap'), {
   ssr: false,
   loading: () => (
@@ -28,16 +34,35 @@ const EarthquakeMap = dynamic(() => import('@/components/EarthquakeMap'), {
   ),
 });
 
+const GlobeView = dynamic(() => import('@/components/GlobeView'), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+      <div className="p-4 border-b border-gray-700">
+        <h2 className="text-white font-semibold text-lg">🌐 3D Globe View</h2>
+      </div>
+      <div className="flex items-center justify-center" style={{ height: '480px' }}>
+        <div className="text-gray-400 animate-pulse">Loading globe...</div>
+      </div>
+    </div>
+  ),
+});
+
+const EEWBanner = dynamic(() => import('@/components/EEWBanner'), { ssr: false });
+
 export default function Home() {
   const { hour, day, week, month, lastUpdated, loading, error } = useEarthquakeData();
   const [mapPeriod, setMapPeriod] = useState<TimePeriod>('day');
   const [tablePeriod, setTablePeriod] = useState<TimePeriod>('day');
+  const [selectedRegion, setSelectedRegion] = useState('global');
+  const [globeView, setGlobeView] = useState(false);
 
-  const mapData = { hour, day, week, month }[mapPeriod];
-  const tableData = { hour, day, week, month }[tablePeriod];
+  const mapData = filterByRegion({ hour, day, week, month }[mapPeriod], selectedRegion);
+  const tableData = filterByRegion({ hour, day, week, month }[tablePeriod], selectedRegion);
 
   return (
     <div className="min-h-screen bg-gray-950">
+      <EEWBanner />
       <Header lastUpdated={lastUpdated} loading={loading} />
 
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
@@ -56,13 +81,45 @@ export default function Home() {
         {/* Counter Grid */}
         <CounterGrid day={day} hour={hour} week={week} month={month} />
 
-        {/* Map */}
+        {/* AI Summary */}
+        {day.length > 0 && <AISummary day={day} week={week} month={month} />}
+
+        {/* Trend Analysis */}
+        {day.length > 0 && <TrendAnalysis day={day} week={week} month={month} />}
+
+        {/* Tsunami Panel */}
+        <TsunamiPanel features={day} />
+
+        {/* Region Dashboard */}
+        <RegionDashboard
+          features={day}
+          onRegionChange={setSelectedRegion}
+          selectedRegion={selectedRegion}
+        />
+
+        {/* Map section */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-white font-semibold text-lg">🗺️ World Map</h2>
+          <div className="flex flex-wrap items-center justify-between mb-3 gap-3">
+            <div className="flex items-center gap-3">
+              <h2 className="text-white font-semibold text-lg">🗺️ World Map</h2>
+              <div className="flex rounded-lg overflow-hidden border border-gray-600 text-xs">
+                <button
+                  onClick={() => setGlobeView(false)}
+                  className={`px-3 py-1.5 transition-colors ${!globeView ? 'bg-orange-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                >
+                  🗺️ 2D Map
+                </button>
+                <button
+                  onClick={() => setGlobeView(true)}
+                  className={`px-3 py-1.5 transition-colors ${globeView ? 'bg-orange-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+                >
+                  🌐 3D Globe
+                </button>
+              </div>
+            </div>
             <TimePeriodSelector selected={mapPeriod} onChange={setMapPeriod} />
           </div>
-          <EarthquakeMap features={mapData} />
+          {globeView ? <GlobeView features={mapData} /> : <EarthquakeMap features={mapData} />}
         </div>
 
         {/* Magnitude Breakdown */}
@@ -77,6 +134,9 @@ export default function Home() {
         {/* Stats Panel */}
         <StatsPanel features={day} />
 
+        {/* Historical Search */}
+        <HistoricalSearch />
+
         {/* Table */}
         <div>
           <div className="flex items-center justify-between mb-3">
@@ -85,6 +145,9 @@ export default function Home() {
           </div>
           <EarthquakeTable features={tableData} />
         </div>
+
+        {/* Volcano Alerts */}
+        <VolcanoAlerts features={day} />
       </main>
 
       <Footer />
