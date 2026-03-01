@@ -8,11 +8,13 @@ const FIRMS_API_URL = FIRMS_API_KEY
   ? `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${FIRMS_API_KEY}/VIIRS_SNPP_NRT/world/1`
   : 'https://firms.modaps.eosdis.nasa.gov/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_Global_24h.csv';
 
+const MAX_FIRE_POINTS = 5000; // limit to avoid memory/render issues with large CSV datasets
+
 function parseCSV(csv: string): WildfirePoint[] {
   const lines = csv.trim().split('\n');
   if (lines.length < 2) return [];
   const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
-  return lines.slice(1, 5001).map((line) => {
+  return lines.slice(1, MAX_FIRE_POINTS + 1).map((line) => {
     const values = line.split(',');
     const get = (key: string) => values[headers.indexOf(key)]?.trim() ?? '';
     return {

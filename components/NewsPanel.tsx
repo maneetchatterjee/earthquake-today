@@ -17,6 +17,8 @@ const SOURCE_COLORS: Record<NewsArticle['source'], string> = {
   ReliefWeb: 'bg-orange-700 text-orange-200',
 };
 
+const BREAKING_NEWS_THRESHOLD_MS = 3600000; // 1 hour
+
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
@@ -27,7 +29,7 @@ function timeAgo(dateStr: string): string {
 }
 
 function isBreaking(dateStr: string): boolean {
-  return Date.now() - new Date(dateStr).getTime() < 3600000;
+  return Date.now() - new Date(dateStr).getTime() < BREAKING_NEWS_THRESHOLD_MS;
 }
 
 export default function NewsPanel({ articles, loading }: NewsPanelProps) {

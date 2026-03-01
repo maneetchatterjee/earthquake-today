@@ -59,7 +59,7 @@ export default function WildfireTracker({ fires, loading, hasApiKey, error }: Wi
     );
   }
 
-  const countries = new Set(fires.map((f) => f.acqDate)).size;
+  const uniqueDates = new Set(fires.map((f) => f.acqDate)).size;
   const maxFrp = fires.length ? Math.max(...fires.map((f) => f.frp)) : 0;
   const satellites = [...new Set(fires.map((f) => f.satellite))].filter(Boolean);
   const recent = [...fires].slice(0, 20);
@@ -70,7 +70,7 @@ export default function WildfireTracker({ fires, loading, hasApiKey, error }: Wi
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { icon: '🔥', label: 'Active Fire Detections', value: fires.length.toLocaleString(), color: 'text-orange-400' },
-          { icon: '📅', label: 'Detection Days', value: countries.toString(), color: 'text-yellow-400' },
+          { icon: '📅', label: 'Detection Days', value: uniqueDates.toString(), color: 'text-yellow-400' },
           { icon: '⚡', label: 'Max FRP (MW)', value: maxFrp.toFixed(1), color: 'text-red-400' },
           { icon: '🛰️', label: 'Satellite Sources', value: satellites.join(', ') || '—', color: 'text-blue-400' },
         ].map(({ icon, label, value, color }) => (

@@ -11,6 +11,11 @@ const RSS_SOURCES: { url: string; source: NewsArticle['source'] }[] = [
   { url: 'https://www.theguardian.com/environment/rss', source: 'Guardian' },
 ];
 
+/** Remove HTML tags by splitting on angle brackets, keeping only even-indexed (non-tag) segments */
+function stripHtml(html: string): string {
+  return html.split('<').map((seg, i) => (i === 0 ? seg : seg.substring(seg.indexOf('>') + 1))).join('');
+}
+
 async function fetchRSS(source: { url: string; source: NewsArticle['source'] }): Promise<NewsArticle[]> {
   try {
     const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(source.url)}&count=10`;
@@ -19,7 +24,7 @@ async function fetchRSS(source: { url: string; source: NewsArticle['source'] }):
     if (data.status !== 'ok') return [];
     return (data.items || []).map((item: { title: string; description: string; link: string; pubDate: string }) => ({
       title: item.title || '',
-      description: item.description?.replace(/<[^>]+>/g, '').slice(0, 200) || '',
+      description: stripHtml(item.description || '').slice(0, 200),
       link: item.link || '',
       pubDate: item.pubDate || '',
       source: source.source,
