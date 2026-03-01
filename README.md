@@ -1,6 +1,6 @@
 # 🌍 Earthquakes Today
 
-A real-time global earthquake monitoring dashboard built with **Next.js 14+**, **Tailwind CSS**, **Leaflet**, and **Recharts**. Inspired by Worldometer, this dashboard shows live seismic activity from the **USGS Earthquake Hazards Program**.
+A real-time global earthquake monitoring dashboard built with **Next.js 16+**, **Tailwind CSS**, **Leaflet**, and **Recharts**. Inspired by Worldometer, this dashboard shows live seismic activity from the **USGS Earthquake Hazards Program**.
 
 ## Features
 
@@ -15,7 +15,7 @@ A real-time global earthquake monitoring dashboard built with **Next.js 14+**, *
 
 ## Tech Stack
 
-- [Next.js 14](https://nextjs.org/) (App Router)
+- [Next.js 16](https://nextjs.org/) (App Router)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Leaflet](https://leafletjs.com/) / [react-leaflet](https://react-leaflet.js.org/)
