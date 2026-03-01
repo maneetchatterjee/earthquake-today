@@ -2,13 +2,22 @@
 
 import GaugeComponent from 'react-gauge-component';
 
+/**
+ * Each entry defines a color segment on the gauge arc.
+ * `limit` is the upper bound of the segment (omit on the final segment).
+ */
+interface ColorSegment {
+  limit?: number;
+  color: string;
+}
+
 interface RadialGaugeProps {
   value: number;
   min?: number;
   max?: number;
   label: string;
   unit?: string;
-  colorScheme?: Array<{ limit?: number; color: string }>;
+  colorScheme?: ColorSegment[];
 }
 
 export default function RadialGauge({ value, min = 0, max = 100, label, unit = '', colorScheme }: RadialGaugeProps) {

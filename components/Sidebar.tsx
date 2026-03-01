@@ -87,7 +87,7 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose
         {/* Nav items */}
         <nav className="flex-1 overflow-y-auto py-2 space-y-0.5">
           {NAV_ITEMS.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href + '/'));
             return (
               <Link
                 key={item.href}
