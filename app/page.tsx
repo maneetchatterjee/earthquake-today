@@ -29,12 +29,69 @@ const MODULE_LINKS = [
 ];
 
 
+const LIVE_FEEDS = [
+  {
+    title: 'NOAA Live Weather Satellite',
+    topic: 'Weather / Atmosphere',
+    embedUrl: 'https://www.youtube.com/embed/O9mYwRlucZY',
+  },
+  {
+    title: 'USGS Earthquake Briefing Stream',
+    topic: 'Earthquakes',
+    embedUrl: 'https://www.youtube.com/embed/h3Yl8ec4f7Q',
+  },
+  {
+    title: 'NASA Earth & Space Live',
+    topic: 'Earth Systems / Space',
+    embedUrl: 'https://www.youtube.com/embed/21X5lGlDOfg',
+  },
+  {
+    title: 'Global News Live (Environment)',
+    topic: 'Breaking News',
+    embedUrl: 'https://www.youtube.com/embed/gCNeDWCI0vo',
+  },
+];
+
+const TOPIC_KEYWORDS: Record<string, string[]> = {
+  Earthquakes: ['earthquake', 'seismic', 'tsunami', 'fault'],
+  Weather: ['weather', 'storm', 'cyclone', 'hurricane', 'flood'],
+  Climate: ['climate', 'warming', 'carbon', 'emission', 'temperature'],
+  Wildfires: ['wildfire', 'fire', 'smoke', 'burn'],
+  Oceans: ['ocean', 'marine', 'sea', 'coastal'],
+};
+
+function toTopicBuckets(titles: string[]) {
+  return Object.entries(TOPIC_KEYWORDS).map(([topic, keywords]) => ({
+    topic,
+    matches: titles.filter((title) => {
+      const lower = title.toLowerCase();
+      return keywords.some((keyword) => lower.includes(keyword));
+    }).slice(0, 3),
+  })).filter((bucket) => bucket.matches.length > 0);
+}
+
+function getScoreBreakdown(earthquakeCount: number, maxMagnitude: number, avgAqi: number, avgTemp: number, fireCount: number) {
+  const earthquakeVolumePenalty = Math.min(20, earthquakeCount * 0.05);
+  const magnitudePenalty = maxMagnitude > 5 ? Math.min(10, (maxMagnitude - 5) * 3) : 0;
+  const aqiPenalty = avgAqi > 150 ? 20 : avgAqi > 100 ? 10 : avgAqi > 50 ? 5 : 0;
+  const temperaturePenalty = Math.min(10, Math.abs(avgTemp - 15) * 0.3);
+  const wildfirePenalty = Math.min(15, fireCount * 0.001);
+
+  return [
+    { key: 'Earthquake volume', penalty: earthquakeVolumePenalty },
+    { key: 'Seismic intensity', penalty: magnitudePenalty },
+    { key: 'Air quality stress', penalty: aqiPenalty },
+    { key: 'Temperature anomaly', penalty: temperaturePenalty },
+    { key: 'Wildfire load', penalty: wildfirePenalty },
+  ];
+}
+
 export default function OverviewPage() {
-  const { day, loading: eqLoading } = useEarthquakeData();
-  const { weatherData } = useWeatherData();
-  const { aqiData } = useAirQualityData();
-  const { fires } = useWildfireData();
-  const { articles } = useNewsData();
+  const { hour, day, week, lastUpdated: eqUpdated, loading: eqLoading } = useEarthquakeData();
+  const { weatherData, lastUpdated: weatherUpdated } = useWeatherData();
+  const { aqiData, lastUpdated: aqiUpdated } = useAirQualityData();
+  const { fires, lastUpdated: fireUpdated, error: wildfireError } = useWildfireData();
+  const { articles, lastUpdated: newsUpdated } = useNewsData();
 
   const maxMag = day.reduce((max, f) => Math.max(max, f.properties.mag || 0), 0);
   const avgAqi = aqiData.length ? Math.round(aqiData.reduce((s, d) => s + d.usAqi, 0) / aqiData.length) : 50;
@@ -48,13 +105,49 @@ export default function OverviewPage() {
     fireCount: fires.length,
   });
 
+  const breakdown = getScoreBreakdown(day.length, maxMag, avgAqi, avgTemp, fires.length);
+  const explainedPenalty = breakdown.reduce((sum, item) => sum + item.penalty, 0);
+
+  const sourceStatuses = [
+    { name: 'Earthquakes', updated: eqUpdated, available: day.length > 0 },
+    { name: 'Weather', updated: weatherUpdated, available: weatherData.length > 0 },
+    { name: 'Air Quality', updated: aqiUpdated, available: aqiData.length > 0 },
+    { name: 'Wildfires', updated: fireUpdated, available: !wildfireError },
+    { name: 'News', updated: newsUpdated, available: articles.length > 0 },
+  ];
+
+  const availableSources = sourceStatuses.filter((s) => s.available).length;
+  const confidencePct = Math.round((availableSources / sourceStatuses.length) * 100);
+
+  const incidentLevel =
+    maxMag >= 6.5 || day.length >= 2500 || avgAqi >= 140 || fires.length > 12000
+      ? { label: 'High', tone: 'text-red-300 bg-red-500/20 border-red-500/40', action: 'Activate incident workflows and watch official advisories.' }
+      : maxMag >= 5.5 || day.length >= 1200 || avgAqi >= 100 || fires.length > 8000
+        ? { label: 'Elevated', tone: 'text-amber-300 bg-amber-500/20 border-amber-500/40', action: 'Increase monitoring cadence and verify regional impacts.' }
+        : { label: 'Routine', tone: 'text-green-300 bg-green-500/20 border-green-500/40', action: 'Continue standard monitoring across all feeds.' };
+
+  const hourlyProjection = Math.round(hour.length * 24);
+  const acceleration = day.length - hourlyProjection;
+
+  const healthStatus =
+    healthScore >= 70
+      ? { label: 'Conditions Normal', tone: 'text-green-400 border-green-500/30 bg-green-500/20', icon: '✅' }
+      : healthScore >= 40
+        ? { label: 'Elevated Risk Signals', tone: 'text-amber-400 border-amber-500/30 bg-amber-500/20', icon: '⚠️' }
+        : { label: 'Critical Conditions', tone: 'text-red-400 border-red-500/30 bg-red-500/20', icon: '🚨' };
+
+  const topEarthquake = day[0];
+
+
+  const topicBuckets = toTopicBuckets(articles.map((article) => article.title));
+
   const stats = [
     { label: 'Earthquakes Today', value: day.length, unit: '', icon: '🌋', color: '#FF3366', href: '/earthquakes' },
     { label: 'Max Magnitude', value: maxMag.toFixed(1), unit: '', icon: '📊', color: '#FFB800', href: '/earthquakes' },
     { label: 'Avg AQI', value: avgAqi, unit: '', icon: '💨', color: '#00FF88', href: '/air-quality' },
     { label: 'Active Fires', value: fires.length.toLocaleString(), unit: '', icon: '🔥', color: '#FF6600', href: '/wildfires' },
-    { label: 'Avg Temp', value: avgTemp.toFixed(1), unit: '°C', icon: '🌡️', color: '#FFB800', href: '/weather' },
-    { label: 'CO₂ Level', value: '425.3', unit: 'ppm', icon: '🌫️', color: '#A855F7', href: '/energy' },
+    { label: '24h Trend', value: acceleration > 0 ? `+${acceleration}` : acceleration, unit: '', icon: '📈', color: acceleration > 0 ? '#F97316' : '#10B981', href: '/earthquakes' },
+    { label: 'Data Confidence', value: confidencePct, unit: '%', icon: '🧪', color: '#60A5FA', href: '/records' },
     { label: 'News Articles', value: articles.length, unit: '', icon: '📰', color: '#64748B', href: '/news' },
     { label: 'Monitoring Since', value: '2024', unit: '', icon: '📡', color: '#00FFFF', href: '/records' },
   ];
@@ -78,12 +171,12 @@ export default function OverviewPage() {
             <div className="space-y-3">
               <p className="inline-flex items-center rounded-full border border-cyan-400/30 bg-cyan-400/10 text-cyan-300 text-xs px-3 py-1 tracking-wide">Global live dashboard</p>
               <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight">🌍 Earth Monitor</h1>
-              <p className="text-slate-300 max-w-2xl">Track seismic, weather, air quality, and wildfire signals in one place with fast links to each live intelligence module.</p>
+              <p className="text-slate-300 max-w-2xl">Live risk intelligence with explainable scoring, source reliability, and incident guidance.</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
-              <div className="flex items-center gap-3 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-live-pulse" />
-                <span className="text-emerald-300 font-bold text-sm tracking-widest">LIVE</span>
+              <div className={`flex items-center gap-3 rounded-full border px-4 py-2 ${incidentLevel.tone}`}>
+                <div className="w-2 h-2 rounded-full bg-current animate-live-pulse" />
+                <span className="font-bold text-sm tracking-widest">INCIDENT: {incidentLevel.label.toUpperCase()}</span>
               </div>
               <Link href="/earthquakes" className="rounded-full border border-white/20 px-4 py-2 text-sm text-white hover:bg-white/10 transition-colors">
                 Open Seismic Feed →
@@ -102,9 +195,8 @@ export default function OverviewPage() {
               <p className="text-sm text-slate-200 mt-1 line-clamp-2">{articles[0]?.title ?? 'No environmental headlines available right now.'}</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-              <p className="text-xs text-slate-400">Updated</p>
-              <p className="text-sm text-slate-200 mt-1">{new Date().toLocaleString()}</p>
-              <p className="text-xs text-cyan-300 mt-1">Data stream synchronized</p>
+              <p className="text-xs text-slate-400">Recommended action</p>
+              <p className="text-sm text-cyan-200 mt-1">{incidentLevel.action}</p>
             </div>
           </div>
         </div>
@@ -125,13 +217,13 @@ export default function OverviewPage() {
                 ]}
               />
             </div>
-            <div className="flex-1 w-full">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+            <div className="flex-1 w-full space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-2xl font-bold text-white">Global Status</h2>
                 <span className={`border rounded-full px-3 py-1 text-sm ${healthStatus.tone}`}>{healthStatus.icon} {healthStatus.label}</span>
               </div>
-              <p className="text-slate-400 mb-4">Composite signal from seismic activity, air quality, temperature anomalies, wildfire burden, and emissions pressure.</p>
-              <div className="w-full h-2 rounded-full bg-white/10 mb-2 overflow-hidden">
+              <p className="text-slate-400">Composite signal from seismic activity, air quality, temperature anomalies, wildfire burden, and emissions pressure.</p>
+              <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-red-500 via-amber-400 to-emerald-400 transition-all duration-700"
                   style={{ width: `${Math.min(100, Math.max(0, healthScore))}%` }}
@@ -141,7 +233,34 @@ export default function OverviewPage() {
                 <span>Health score</span>
                 <span className="font-mono text-slate-200">{healthScore}/100</span>
               </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-2 text-xs">
+                {breakdown.map((item) => (
+                  <div key={item.key} className="rounded-lg border border-white/10 bg-white/5 px-2 py-2">
+                    <p className="text-slate-400">{item.key}</p>
+                    <p className="text-slate-200 font-mono">-{item.penalty.toFixed(1)}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-slate-500">Explained penalty total: {explainedPenalty.toFixed(1)} points.</p>
             </div>
+          </div>
+        </GlassCard>
+
+        <GlassCard className="p-6 border border-white/10">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h3 className="text-white text-lg font-semibold">📡 Data reliability and freshness</h3>
+            <span className="text-xs text-cyan-300">Confidence: {confidencePct}%</span>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            {sourceStatuses.map((source) => (
+              <div key={source.name} className="rounded-xl border border-white/10 bg-white/5 p-3">
+                <p className="text-sm text-slate-200 font-medium">{source.name}</p>
+                <p className={`text-xs mt-1 ${source.available ? 'text-emerald-300' : 'text-amber-300'}`}>
+                  {source.available ? 'Available' : 'Degraded'}
+                </p>
+                <p className="text-xs text-slate-500 mt-1">{source.updated ? source.updated.toLocaleTimeString() : 'No refresh time'}</p>
+              </div>
+            ))}
           </div>
         </GlassCard>
 
@@ -173,6 +292,58 @@ export default function OverviewPage() {
           </div>
         </div>
 
+
+        <GlassCard className="p-6 border border-white/10">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h3 className="text-white text-lg font-semibold">🎥 Live Earth Monitor Video Feeds</h3>
+            <span className="text-xs text-slate-400">Embedded live streams</span>
+          </div>
+          <div className="grid lg:grid-cols-2 gap-4">
+            {LIVE_FEEDS.map((feed) => (
+              <div key={feed.title} className="rounded-2xl border border-white/10 bg-black/30 overflow-hidden">
+                <div className="aspect-video">
+                  <iframe
+                    title={feed.title}
+                    src={feed.embedUrl}
+                    className="w-full h-full"
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                </div>
+                <div className="p-3">
+                  <p className="text-sm text-slate-100 font-medium">{feed.title}</p>
+                  <p className="text-xs text-slate-400 mt-1">{feed.topic}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </GlassCard>
+
+        <GlassCard className="p-6 border border-white/10">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h3 className="text-white text-lg font-semibold">📰 Live Topic News Desk</h3>
+            <Link href="/news" className="text-xs text-cyan-300 hover:text-cyan-200">Open full news feed →</Link>
+          </div>
+          {topicBuckets.length > 0 ? (
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-3">
+              {topicBuckets.map((bucket) => (
+                <div key={bucket.topic} className="rounded-xl border border-white/10 bg-white/5 p-3">
+                  <h4 className="text-sm font-semibold text-slate-100 mb-2">{bucket.topic}</h4>
+                  <ul className="space-y-2">
+                    {bucket.matches.map((headline) => (
+                      <li key={headline} className="text-xs text-slate-300 leading-relaxed">• {headline}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-sm text-slate-400">No topic-classified headlines available yet. Check back after the next news refresh.</div>
+          )}
+        </GlassCard>
+
         <GlassCard className="p-6">
           <div className="flex items-center justify-between gap-3 mb-4">
             <h2 className="text-white font-semibold text-xl">⚡ Recent Seismic Activity</h2>
@@ -196,6 +367,27 @@ export default function OverviewPage() {
               })}
             </div>
           )}
+        </GlassCard>
+
+        <GlassCard className="p-6 border border-white/10">
+          <h3 className="text-white text-lg font-semibold mb-3">📊 Trend intelligence</h3>
+          <div className="grid md:grid-cols-3 gap-3 text-sm">
+            <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+              <p className="text-slate-400">1h → 24h projection</p>
+              <p className="text-slate-200 font-mono mt-1">{hour.length} × 24 = {hourlyProjection}</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+              <p className="text-slate-400">Observed 24h count</p>
+              <p className="text-slate-200 font-mono mt-1">{day.length}</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+              <p className="text-slate-400">Acceleration signal</p>
+              <p className={`font-mono mt-1 ${acceleration > 0 ? 'text-amber-300' : 'text-emerald-300'}`}>
+                {acceleration > 0 ? `+${acceleration}` : acceleration} vs projected baseline
+              </p>
+              <p className="text-xs text-slate-500 mt-1">7d total monitored: {week.length}</p>
+            </div>
+          </div>
         </GlassCard>
       </main>
     </div>
