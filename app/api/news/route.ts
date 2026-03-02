@@ -65,5 +65,7 @@ export async function GET(req: NextRequest) {
     .slice(0, 30);
 
   cacheSet(cacheKey, articles, TTL_MS);
-  return NextResponse.json({ articles });
+  return NextResponse.json({ articles }, {
+    headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1800' },
+  });
 }

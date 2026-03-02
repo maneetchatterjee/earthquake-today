@@ -33,5 +33,7 @@ export async function GET() {
   };
 
   cacheSet(cacheKey, data, TTL_MS);
-  return NextResponse.json(data);
+  return NextResponse.json(data, {
+    headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' },
+  });
 }

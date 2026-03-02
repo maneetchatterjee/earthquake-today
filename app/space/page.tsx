@@ -6,8 +6,9 @@ import { useISSData } from '@/hooks/useISSData';
 import { useAsteroidData } from '@/hooks/useAsteroidData';
 import { getMoonPhase } from '@/lib/astronomy';
 import RadialGauge from '@/components/ui/RadialGauge';
+import PanelSkeleton from '@/components/ui/PanelSkeleton';
 
-const ISSMap = dynamic(() => import('@/components/ISSMap'), { ssr: false, loading: () => <div className="h-64 bg-white/5 rounded-xl animate-pulse" /> });
+const ISSMap = dynamic(() => import('@/components/ISSMap'), { ssr: false, loading: () => <PanelSkeleton height="300px" /> });
 
 export default function SpacePage() {
   const { kpIndex, solarWindSpeed, sunspotNumber, latestFlare, loading: solarLoading } = useSolarData();

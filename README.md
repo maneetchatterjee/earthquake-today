@@ -38,12 +38,14 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Optional API Keys
 
-Set in `.env.local`:
+Set in `.env.local` (see `.env.example`):
 
 ```env
-NEXT_PUBLIC_FIRMS_MAP_KEY=your_nasa_firms_key
-NEXT_PUBLIC_NASA_API_KEY=your_nasa_api_key
+FIRMS_MAP_KEY=your_nasa_firms_key
+NASA_API_KEY=your_nasa_api_key
 ```
+
+> **Security note:** API keys are server-side only and never exposed to the browser.
 
 ## Data Sources
 

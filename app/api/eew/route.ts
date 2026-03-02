@@ -24,7 +24,9 @@ export async function GET() {
 
     const data = await res.json();
     cacheSet(cacheKey, data, TTL_MS);
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to fetch EEW data';
     return NextResponse.json({ error: message }, { status: 502 });

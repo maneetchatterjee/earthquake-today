@@ -18,5 +18,7 @@ export async function GET() {
       news: { url: '/api/news' },
       iss: { url: '/api/iss' },
     },
+  }, {
+    headers: { 'Cache-Control': 'no-cache' },
   });
 }

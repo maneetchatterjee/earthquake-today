@@ -9,7 +9,6 @@ import CounterGrid from '@/components/CounterGrid';
 import TimePeriodSelector from '@/components/TimePeriodSelector';
 import MagnitudeBreakdown from '@/components/MagnitudeBreakdown';
 import EarthquakeTable from '@/components/EarthquakeTable';
-import Charts from '@/components/Charts';
 import StatsPanel from '@/components/StatsPanel';
 import TsunamiPanel from '@/components/TsunamiPanel';
 import AISummary from '@/components/AISummary';
@@ -17,35 +16,23 @@ import TrendAnalysis from '@/components/TrendAnalysis';
 import RegionDashboard from '@/components/RegionDashboard';
 import HistoricalSearch from '@/components/HistoricalSearch';
 import VolcanoAlerts from '@/components/VolcanoAlerts';
+import PanelSkeleton from '@/components/ui/PanelSkeleton';
 import { filterByRegion } from '@/lib/regions';
 import { TimePeriod } from '@/lib/types';
 
 const EarthquakeMap = dynamic(() => import('@/components/EarthquakeMap'), {
   ssr: false,
-  loading: () => (
-    <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
-      <div className="p-4 border-b border-gray-700">
-        <h2 className="text-white font-semibold text-lg">🗺️ Interactive World Map</h2>
-      </div>
-      <div className="flex items-center justify-center" style={{ height: '480px' }}>
-        <div className="text-gray-400 animate-pulse">Loading map...</div>
-      </div>
-    </div>
-  ),
+  loading: () => <PanelSkeleton height="480px" />,
 });
 
 const GlobeView = dynamic(() => import('@/components/GlobeView'), {
   ssr: false,
-  loading: () => (
-    <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
-      <div className="p-4 border-b border-gray-700">
-        <h2 className="text-white font-semibold text-lg">🌐 3D Globe View</h2>
-      </div>
-      <div className="flex items-center justify-center" style={{ height: '480px' }}>
-        <div className="text-gray-400 animate-pulse">Loading globe...</div>
-      </div>
-    </div>
-  ),
+  loading: () => <PanelSkeleton height="480px" />,
+});
+
+const Charts = dynamic(() => import('@/components/Charts'), {
+  ssr: false,
+  loading: () => <PanelSkeleton height="300px" />,
 });
 
 const EEWBanner = dynamic(() => import('@/components/EEWBanner'), { ssr: false });

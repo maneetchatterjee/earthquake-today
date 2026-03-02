@@ -8,7 +8,10 @@ export async function GET() {
   const cached = cacheGet<string>(cacheKey);
   if (cached) {
     return new NextResponse(cached, {
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
     });
   }
 
@@ -30,7 +33,10 @@ export async function GET() {
     const text = await res.text();
     cacheSet(cacheKey, text, TTL_MS);
     return new NextResponse(text, {
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to fetch wildfire data';

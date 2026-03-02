@@ -114,7 +114,7 @@ export default function EnvironmentCounters() {
               <span>{c.icon}</span>
               <span>{c.label}</span>
             </div>
-            <div className={`text-2xl font-bold font-mono tabular-nums ${c.color}`}>
+            <div className={`text-2xl font-bold font-mono tabular-nums ${c.color}`} aria-live="polite" role="status">
               {formatCounterValue(c.value)}
             </div>
             <div className="text-gray-500 text-xs">{c.unit}</div>
