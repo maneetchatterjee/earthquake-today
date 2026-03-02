@@ -27,19 +27,18 @@ export function useEnergyData(): EnergyData {
     setLoading(true);
     setError(null);
     try {
-      const [intensityRes, generationRes] = await Promise.allSettled([
-        fetch('https://api.carbonintensity.org.uk/intensity'),
-        fetch('https://api.carbonintensity.org.uk/generation'),
-      ]);
+      const res = await fetch('/api/energy');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
 
-      if (intensityRes.status === 'fulfilled') {
-        const d = await intensityRes.value.json();
+      if (data.intensity) {
+        const d = data.intensity;
         const intensity = d.data?.[0]?.intensity?.actual || d.data?.[0]?.intensity?.forecast || 0;
         setCarbonIntensity(intensity);
       }
 
-      if (generationRes.status === 'fulfilled') {
-        const d = await generationRes.value.json();
+      if (data.generation) {
+        const d = data.generation;
         const mix: GenerationMix[] = d.data?.generationmix || [];
         setGenerationMix(mix);
         const renewables = ['wind', 'solar', 'hydro', 'biomass', 'nuclear'];

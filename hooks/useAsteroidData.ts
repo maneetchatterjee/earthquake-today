@@ -20,9 +20,8 @@ interface AsteroidData {
   error: string | null;
 }
 
-// DEMO_KEY has a rate limit of 30 req/hour and 50 req/day.
-// Set NEXT_PUBLIC_NASA_API_KEY env var for production use (free at https://api.nasa.gov/).
-const NASA_KEY = process.env.NEXT_PUBLIC_NASA_API_KEY || 'DEMO_KEY';
+// NASA API key is now managed server-side in /api/nasa route.
+// See NASA_API_KEY in .env.example (free at https://api.nasa.gov/).
 
 export function useAsteroidData(): AsteroidData {
   const [asteroids, setAsteroids] = useState<Asteroid[]>([]);
@@ -42,7 +41,7 @@ export function useAsteroidData(): AsteroidData {
       const endStr = end.toISOString().split('T')[0];
 
       const res = await fetch(
-        `https://api.nasa.gov/neo/rest/v1/feed?start_date=${startStr}&end_date=${endStr}&api_key=${NASA_KEY}`
+        `/api/nasa?start_date=${startStr}&end_date=${endStr}`
       );
       const data = await res.json();
 

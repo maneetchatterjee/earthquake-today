@@ -32,42 +32,27 @@ export function useSolarData(): SolarData {
     setLoading(true);
     setError(null);
     try {
-      const [kpRes, plasmaRes, flareRes, sunspotRes] = await Promise.allSettled([
-        fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json'),
-        fetch('https://services.swpc.noaa.gov/products/solar-wind/plasma-7-day.json'),
-        fetch('https://services.swpc.noaa.gov/json/goes/primary/xray-flares-latest.json'),
-        fetch('https://services.swpc.noaa.gov/json/solar-cycle/sunspots.json'),
-      ]);
+      const res = await fetch('/api/solar');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
 
-      if (kpRes.status === 'fulfilled') {
-        const kpData = await kpRes.value.json();
-        if (Array.isArray(kpData) && kpData.length > 1) {
-          const last = kpData[kpData.length - 1];
-          setKpIndex(parseFloat(last[1]) || 0);
-        }
+      if (Array.isArray(data.kp) && data.kp.length > 1) {
+        const last = data.kp[data.kp.length - 1];
+        setKpIndex(parseFloat(last[1]) || 0);
       }
 
-      if (plasmaRes.status === 'fulfilled') {
-        const plasmaData = await plasmaRes.value.json();
-        if (Array.isArray(plasmaData) && plasmaData.length > 1) {
-          const last = plasmaData[plasmaData.length - 1];
-          setSolarWindSpeed(parseFloat(last[1]) || 0);
-        }
+      if (Array.isArray(data.plasma) && data.plasma.length > 1) {
+        const last = data.plasma[data.plasma.length - 1];
+        setSolarWindSpeed(parseFloat(last[1]) || 0);
       }
 
-      if (flareRes.status === 'fulfilled') {
-        const flareData = await flareRes.value.json();
-        if (Array.isArray(flareData) && flareData.length > 0) {
-          setLatestFlare(flareData[flareData.length - 1]);
-        }
+      if (Array.isArray(data.flares) && data.flares.length > 0) {
+        setLatestFlare(data.flares[data.flares.length - 1]);
       }
 
-      if (sunspotRes.status === 'fulfilled') {
-        const ssData = await sunspotRes.value.json();
-        if (Array.isArray(ssData) && ssData.length > 0) {
-          const last = ssData[ssData.length - 1];
-          setSunspotNumber(parseFloat(last.smoothed_ssn) || parseFloat(last.ssn) || 0);
-        }
+      if (Array.isArray(data.sunspots) && data.sunspots.length > 0) {
+        const last = data.sunspots[data.sunspots.length - 1];
+        setSunspotNumber(parseFloat(last.smoothed_ssn) || parseFloat(last.ssn) || 0);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to fetch solar data');

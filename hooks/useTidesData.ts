@@ -14,7 +14,7 @@ async function fetchTidePredictions(station: TideStation): Promise<TidePredictio
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
-    const url = `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&begin_date=${formatDate(today)}&end_date=${formatDate(tomorrow)}&datum=MLLW&station=${station.id}&time_zone=gmt&units=metric&interval=hilo&format=json`;
+    const url = `/api/tides?station=${station.id}&begin_date=${formatDate(today)}&end_date=${formatDate(tomorrow)}`;
     const res = await fetch(url);
     const data = await res.json();
     return data.predictions ?? [];

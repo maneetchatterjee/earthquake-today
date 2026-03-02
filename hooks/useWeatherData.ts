@@ -13,7 +13,7 @@ interface WeatherState {
 
 async function fetchCityWeather(city: City): Promise<WeatherData> {
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=auto`;
+    const url = `/api/weather?lat=${city.lat}&lng=${city.lng}`;
     const res = await fetch(url);
     const data = await res.json();
     const c = data.current;
