@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useEarthquakeData } from '@/hooks/useEarthquakeData';
 import { useWeatherData } from '@/hooks/useWeatherData';
@@ -92,6 +93,12 @@ export default function OverviewPage() {
   const { aqiData, lastUpdated: aqiUpdated } = useAirQualityData();
   const { fires, lastUpdated: fireUpdated, error: wildfireError } = useWildfireData();
   const { articles, lastUpdated: newsUpdated } = useNewsData();
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const maxMag = day.reduce((max, f) => Math.max(max, f.properties.mag || 0), 0);
   const avgAqi = aqiData.length ? Math.round(aqiData.reduce((s, d) => s + d.usAqi, 0) / aqiData.length) : 50;
@@ -203,19 +210,23 @@ export default function OverviewPage() {
 
         <GlassCard className="p-8 border border-white/15">
           <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="flex-shrink-0">
-              <RadialGauge
-                value={eqLoading ? 50 : healthScore}
-                min={0}
-                max={100}
-                label="Earth Health Score"
-                unit=""
-                colorScheme={[
-                  { limit: 33, color: '#FF3366' },
-                  { limit: 66, color: '#FFB800' },
-                  { color: '#00FF88' },
-                ]}
-              />
+            <div className="flex-shrink-0 min-h-[220px] min-w-[220px] flex items-center justify-center">
+              {isMounted ? (
+                <RadialGauge
+                  value={eqLoading ? 50 : healthScore}
+                  min={0}
+                  max={100}
+                  label="Earth Health Score"
+                  unit=""
+                  colorScheme={[
+                    { limit: 33, color: '#FF3366' },
+                    { limit: 66, color: '#FFB800' },
+                    { color: '#00FF88' },
+                  ]}
+                />
+              ) : (
+                <div className="h-[220px] w-[220px] rounded-full border border-white/10 bg-white/5 animate-pulse" aria-hidden />
+              )}
             </div>
             <div className="flex-1 w-full space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
