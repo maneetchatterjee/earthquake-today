@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import 'leaflet/dist/leaflet.css';
 import { USGSFeature } from '@/lib/types';
 import { getMagnitudeRadius, getDepthColor, formatTimeAgo } from '@/lib/utils';
 
