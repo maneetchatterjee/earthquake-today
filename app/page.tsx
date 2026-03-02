@@ -136,14 +136,14 @@ export default function OverviewPage() {
   const hourlyProjection = Math.round(hour.length * 24);
   const acceleration = day.length - hourlyProjection;
 
-  const healthStatus =
+  const healthStatusInfo =
     healthScore >= 70
       ? { label: 'Conditions Normal', tone: 'text-green-400 border-green-500/30 bg-green-500/20', icon: '✅' }
       : healthScore >= 40
         ? { label: 'Elevated Risk Signals', tone: 'text-amber-400 border-amber-500/30 bg-amber-500/20', icon: '⚠️' }
         : { label: 'Critical Conditions', tone: 'text-red-400 border-red-500/30 bg-red-500/20', icon: '🚨' };
 
-  const topEarthquake = day[0];
+  const featuredEarthquake = day[0];
 
 
   const topicBuckets = toTopicBuckets(articles.map((article) => article.title));
@@ -195,7 +195,7 @@ export default function OverviewPage() {
             <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
               <p className="text-xs text-slate-400">Strongest event</p>
               <p className="text-xl font-bold text-white mt-1">M{maxMag.toFixed(1)}</p>
-              <p className="text-xs text-slate-400 mt-1 truncate">{topEarthquake?.properties.place ?? 'No event data yet'}</p>
+              <p className="text-xs text-slate-400 mt-1 truncate">{featuredEarthquake?.properties.place ?? 'No event data yet'}</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
               <p className="text-xs text-slate-400">Latest headline</p>
@@ -231,7 +231,7 @@ export default function OverviewPage() {
             <div className="flex-1 w-full space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-2xl font-bold text-white">Global Status</h2>
-                <span className={`border rounded-full px-3 py-1 text-sm ${healthStatus.tone}`}>{healthStatus.icon} {healthStatus.label}</span>
+                <span className={`border rounded-full px-3 py-1 text-sm ${healthStatusInfo.tone}`}>{healthStatusInfo.icon} {healthStatusInfo.label}</span>
               </div>
               <p className="text-slate-400">Composite signal from seismic activity, air quality, temperature anomalies, wildfire burden, and emissions pressure.</p>
               <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
