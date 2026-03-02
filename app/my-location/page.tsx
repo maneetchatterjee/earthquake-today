@@ -64,7 +64,7 @@ export default function MyLocationPage() {
     const { lat, lng } = location;
 
     // Fetch weather
-    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,precipitation&timezone=auto`)
+    fetch(`/api/weather?lat=${lat}&lng=${lng}`)
       .then(r => r.json())
       .then(d => {
         const c = d.current;
@@ -79,14 +79,14 @@ export default function MyLocationPage() {
       .catch((e) => console.warn('Could not fetch local weather:', e));
 
     // Fetch AQI
-    fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&current=us_aqi&timezone=auto`)
+    fetch(`/api/air-quality?lat=${lat}&lng=${lng}`)
       .then(r => r.json())
       .then(d => setAqi(d.current?.us_aqi ?? null))
       .catch((e) => console.warn('Could not fetch local AQI:', e));
 
     // Fetch nearby earthquakes
     const minLat = lat - 5, maxLat = lat + 5, minLng = lng - 5, maxLng = lng + 5;
-    fetch(`https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minlatitude=${minLat}&maxlatitude=${maxLat}&minlongitude=${minLng}&maxlongitude=${maxLng}&minmagnitude=2&orderby=time&limit=5`)
+    fetch(`/api/earthquakes-local?minlatitude=${minLat}&maxlatitude=${maxLat}&minlongitude=${minLng}&maxlongitude=${maxLng}`)
       .then(r => r.json())
       .then(d => {
         const features = d.features || [];
@@ -101,7 +101,7 @@ export default function MyLocationPage() {
       .catch((e) => console.warn('Could not fetch nearby earthquakes:', e));
 
     // Reverse geocode
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+    fetch(`/api/geocode?lat=${lat}&lng=${lng}`)
       .then(r => r.json())
       .then(d => setLocationName(d.display_name?.split(',').slice(0, 3).join(', ') || ''))
       .catch((e) => console.warn('Could not reverse geocode location:', e));

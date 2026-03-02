@@ -19,7 +19,7 @@ const OCEAN_POINTS = [
 
 async function fetchMarinePoint(point: { name: string; lat: number; lng: number }): Promise<MarinePoint> {
   try {
-    const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${point.lat}&longitude=${point.lng}&current=wave_height,wave_direction,wave_period,wind_wave_height,swell_wave_height&daily=wave_height_max`;
+    const url = `/api/marine?lat=${point.lat}&lng=${point.lng}`;
     const res = await fetch(url);
     const data = await res.json();
     const c = data.current;

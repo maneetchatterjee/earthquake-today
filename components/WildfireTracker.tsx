@@ -31,7 +31,7 @@ export default function WildfireTracker({ fires, loading, hasApiKey, error }: Wi
           </li>
           <li>
             Add to your <code className="bg-gray-700 px-1 rounded">.env.local</code>:{' '}
-            <code className="bg-gray-700 px-1 rounded">NEXT_PUBLIC_FIRMS_MAP_KEY=your_key_here</code>
+            <code className="bg-gray-700 px-1 rounded">FIRMS_MAP_KEY=your_key_here</code>
           </li>
           <li>Restart the dev server</li>
         </ol>

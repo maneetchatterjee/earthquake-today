@@ -7,7 +7,7 @@ const REFRESH_INTERVAL = 600000; // 10 minutes
 
 async function fetchCityAQI(city: City): Promise<AirQualityData> {
   try {
-    const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${city.lat}&longitude=${city.lng}&current=pm10,pm2_5,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,us_aqi,european_aqi&timezone=auto`;
+    const url = `/api/air-quality?lat=${city.lat}&lng=${city.lng}`;
     const res = await fetch(url);
     const data = await res.json();
     const c = data.current;

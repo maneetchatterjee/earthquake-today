@@ -21,7 +21,7 @@ export default function EEWBanner() {
 
     async function fetchEEW() {
       try {
-        const res = await fetch('https://api.wolfx.jp/jma_eew.json', {
+        const res = await fetch('/api/eew', {
           signal: AbortSignal.timeout(5000),
         });
         const data = await res.json();

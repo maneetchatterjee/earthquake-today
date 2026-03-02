@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { USGSFeature, USGSResponse, TimePeriod } from '@/lib/types';
-import { USGS_FEEDS } from '@/lib/utils';
 
 interface EarthquakeData {
   hour: USGSFeature[];
@@ -30,10 +29,10 @@ export function useEarthquakeData() {
   const fetchData = useCallback(async () => {
     try {
       const [hourRes, dayRes, weekRes, monthRes] = await Promise.all([
-        fetch(USGS_FEEDS.hour),
-        fetch(USGS_FEEDS.day),
-        fetch(USGS_FEEDS.week),
-        fetch(USGS_FEEDS.month),
+        fetch('/api/earthquakes?period=hour'),
+        fetch('/api/earthquakes?period=day'),
+        fetch('/api/earthquakes?period=week'),
+        fetch('/api/earthquakes?period=month'),
       ]);
 
       const [hourData, dayData, weekData, monthData]: USGSResponse[] = await Promise.all([
