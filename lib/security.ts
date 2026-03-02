@@ -1,3 +1,5 @@
+import DOMPurify from 'isomorphic-dompurify';
+
 export const ALLOWED_DOMAINS = [
   'earthquake.usgs.gov',
   'api.open-meteo.com',
@@ -29,14 +31,9 @@ export function sanitizeInput(input: string): string {
   return input.replace(/[<>"'&;`\\]/g, '');
 }
 
-/** Strip all HTML tags and dangerous content from a string */
+/** Strip all HTML tags and dangerous content, returning plain text */
 export function stripHtml(html: string): string {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<iframe[\s\S]*?<\/iframe>/gi, '')
-    .replace(/<object[\s\S]*?<\/object>/gi, '')
-    .replace(/<embed[^>]*>/gi, '')
-    .replace(/<[^>]* on\w+[\s\S]*?>/gi, '')
-    .replace(/<[^>]+>/g, '')
-    .trim();
+  // Use DOMPurify to sanitize server-side, then strip all remaining HTML for plain text output
+  const clean = DOMPurify.sanitize(html, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+  return clean.trim();
 }
