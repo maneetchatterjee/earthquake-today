@@ -1,6 +1,10 @@
+import Disclaimer from '@/components/Disclaimer';
+
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 border-t border-gray-700 mt-12">
+    <>
+      <Disclaimer />
+      <footer className="bg-gray-900 border-t border-gray-700 mt-12">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
           <div>
@@ -47,5 +51,6 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+    </>
   );
 }

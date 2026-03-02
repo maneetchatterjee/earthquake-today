@@ -40,7 +40,9 @@ export async function GET(req: NextRequest) {
 
     const data = await res.json();
     cacheSet(cacheKey, data, TTL_MS);
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' },
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to fetch air quality data';
     return NextResponse.json({ error: message }, { status: 502 });

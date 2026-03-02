@@ -14,6 +14,22 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     } catch (e) {
       console.warn('Could not read sidebar state from localStorage:', e);
     }
+
+    // RTL support for Arabic
+    try {
+      const prefs = localStorage.getItem('em-preferences');
+      if (prefs) {
+        const parsed = JSON.parse(prefs) as { language?: string };
+        document.documentElement.dir = parsed.language === 'ar' ? 'rtl' : 'ltr';
+      }
+    } catch { /* ignore */ }
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch((err) => {
+        console.warn('Service worker registration failed:', err);
+      });
+    }
   }, []);
 
   const handleToggle = () => {

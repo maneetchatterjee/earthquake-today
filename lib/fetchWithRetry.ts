@@ -1,17 +1,30 @@
+import { getCircuitBreaker, CircuitOpenError } from '@/lib/circuitBreaker';
+
+function getDomain(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return url;
+  }
+}
+
 export async function fetchWithRetry(
   url: string,
   options?: RequestInit,
   retries = 3
 ): Promise<Response> {
+  const breaker = getCircuitBreaker(getDomain(url));
   let lastError: unknown;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      const res = await fetch(url, options);
+      const res = await breaker.execute(() => fetch(url, options));
       if (res.ok) return res;
       // Treat non-ok as an error to trigger retry
       lastError = new Error(`HTTP ${res.status}`);
     } catch (err) {
+      // Don't retry if circuit is open
+      if (err instanceof CircuitOpenError) throw err;
       lastError = err;
     }
 

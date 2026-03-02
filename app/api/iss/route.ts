@@ -35,7 +35,9 @@ export async function GET(req: NextRequest) {
     const data = await res.json();
     const ttl = endpoint === 'position' ? POSITION_TTL_MS : ASTROS_TTL_MS;
     cacheSet(cacheKey, data, ttl);
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to fetch ISS data';
     return NextResponse.json({ error: message }, { status: 502 });

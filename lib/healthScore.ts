@@ -50,3 +50,49 @@ export function calculateHealthScore(input: HealthScoreInput): number {
 
   return Math.max(0, Math.min(100, Math.round(score)));
 }
+
+export interface RiskPriors {
+  earthquakeRate: number; // base rate 0-1
+  aqiRate: number;
+  wildfireRate: number;
+  stormRate: number;
+}
+
+export interface RiskObservations {
+  earthquakeMag?: number;
+  aqi?: number;
+  wildfireCount?: number;
+  uvIndex?: number;
+}
+
+export function calculateRiskScore(priors: RiskPriors, observations: RiskObservations): number {
+  // Bayesian update: posterior ∝ prior * likelihood
+  let earthquakePosterior = priors.earthquakeRate;
+  if (observations.earthquakeMag !== undefined) {
+    // Likelihood increases with magnitude above threshold
+    const likelihood = observations.earthquakeMag > 4 ? Math.min(1, observations.earthquakeMag / 8) : 0.1;
+    earthquakePosterior = priors.earthquakeRate * likelihood;
+  }
+
+  let aqiPosterior = priors.aqiRate;
+  if (observations.aqi !== undefined) {
+    const likelihood = observations.aqi > 100 ? Math.min(1, observations.aqi / 300) : 0.1;
+    aqiPosterior = priors.aqiRate * likelihood;
+  }
+
+  let wildfirePosterior = priors.wildfireRate;
+  if (observations.wildfireCount !== undefined) {
+    const likelihood = observations.wildfireCount > 0 ? Math.min(1, observations.wildfireCount / 100) : 0.05;
+    wildfirePosterior = priors.wildfireRate * likelihood;
+  }
+
+  let stormPosterior = priors.stormRate;
+  if (observations.uvIndex !== undefined) {
+    const likelihood = observations.uvIndex > 8 ? Math.min(1, observations.uvIndex / 11) : 0.1;
+    stormPosterior = priors.stormRate * likelihood;
+  }
+
+  // Normalise and combine into 0-100 score
+  const combined = (earthquakePosterior + aqiPosterior + wildfirePosterior + stormPosterior) / 4;
+  return Math.max(0, Math.min(100, Math.round(combined * 100)));
+}

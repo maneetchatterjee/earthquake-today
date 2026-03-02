@@ -1,4 +1,4 @@
-export type Language = 'en' | 'es' | 'fr' | 'hi' | 'zh' | 'ja';
+export type Language = 'en' | 'es' | 'fr' | 'hi' | 'zh' | 'ja' | 'pt' | 'ar';
 
 export const LANGUAGES: Record<Language, string> = {
   en: 'English',
@@ -7,6 +7,8 @@ export const LANGUAGES: Record<Language, string> = {
   hi: 'हिन्दी',
   zh: '中文',
   ja: '日本語',
+  pt: 'Português',
+  ar: 'العربية',
 };
 
 export const TRANSLATIONS: Record<Language, Record<string, string>> = {
@@ -129,6 +131,46 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     live: 'ライブ',
     earthHealthScore: '地球健康スコア',
     noData: 'データなし',
+  },
+  pt: {
+    overview: 'Visão geral',
+    earthquakes: 'Terremotos',
+    weather: 'Clima',
+    airQuality: 'Qualidade do ar',
+    wildfires: 'Incêndios florestais',
+    oceans: 'Oceanos e marés',
+    space: 'Espaço',
+    energy: 'Energia e emissões',
+    atmosphere: 'Atmosfera e ciência',
+    human: 'Atividade humana',
+    news: 'Notícias',
+    myLocation: 'Minha localização',
+    records: 'Recordes e pontuação',
+    loading: 'Carregando...',
+    error: 'Erro',
+    live: 'AO VIVO',
+    earthHealthScore: 'Pontuação de saúde da Terra',
+    noData: 'Nenhum dado disponível',
+  },
+  ar: {
+    overview: 'نظرة عامة',
+    earthquakes: 'زلازل',
+    weather: 'الطقس',
+    airQuality: 'جودة الهواء',
+    wildfires: 'حرائق الغابات',
+    oceans: 'المحيطات والمد والجزر',
+    space: 'الفضاء',
+    energy: 'الطاقة والانبعاثات',
+    atmosphere: 'الغلاف الجوي والعلوم',
+    human: 'النشاط البشري',
+    news: 'الأخبار',
+    myLocation: 'موقعي',
+    records: 'السجلات والنتيجة',
+    loading: '...جارٍ التحميل',
+    error: 'خطأ',
+    live: 'مباشر',
+    earthHealthScore: 'درجة صحة الأرض',
+    noData: 'لا تتوفر بيانات',
   },
 };
 

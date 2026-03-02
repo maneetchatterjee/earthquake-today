@@ -97,9 +97,13 @@ export async function GET(req: NextRequest) {
     console.warn('Earthquake data validation failed:', parsed.error.message);
     const invalidated = { ...(data as object), _validated: false };
     cacheSet(cacheKey, invalidated, TTL_MS);
-    return NextResponse.json(invalidated);
+    return NextResponse.json(invalidated, {
+      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
+    });
   }
 
   cacheSet(cacheKey, data, TTL_MS);
-  return NextResponse.json(data);
+  return NextResponse.json(data, {
+    headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
+  });
 }
