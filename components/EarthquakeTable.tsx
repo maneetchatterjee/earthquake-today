@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { USGSFeature } from '@/lib/types';
 import { formatTimeAgo, formatDateTime, getMagnitudeColor } from '@/lib/utils';
+import { exportToCSV, exportToJSON } from '@/lib/export';
 
 interface EarthquakeTableProps {
   features: USGSFeature[];
@@ -80,6 +81,34 @@ export default function EarthquakeTable({ features }: EarthquakeTableProps) {
           </select>
         </label>
         <span className="text-gray-500 text-sm">{sorted.length} events</span>
+        <button
+          onClick={() => exportToCSV(sorted.map((f) => ({
+            time: new Date(f.properties.time).toISOString(),
+            magnitude: f.properties.mag,
+            place: f.properties.place,
+            depth_km: f.geometry.coordinates[2],
+            tsunami: f.properties.tsunami,
+            url: f.properties.url,
+          })), 'earthquakes')}
+          className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white rounded text-sm border border-gray-600 transition-colors"
+        >
+          Export CSV
+        </button>
+        <button
+          onClick={() => exportToJSON(sorted.map((f) => ({
+            id: f.id,
+            time: new Date(f.properties.time).toISOString(),
+            magnitude: f.properties.mag,
+            place: f.properties.place,
+            depth_km: f.geometry.coordinates[2],
+            tsunami: f.properties.tsunami,
+            url: f.properties.url,
+            coordinates: f.geometry.coordinates,
+          })), 'earthquakes')}
+          className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white rounded text-sm border border-gray-600 transition-colors"
+        >
+          Export JSON
+        </button>
       </div>
 
       {/* Table */}

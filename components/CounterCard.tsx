@@ -72,7 +72,7 @@ export default function CounterCard({
         <span>{icon}</span>
         <span>{title}</span>
       </div>
-      <div className="text-3xl font-bold text-white mt-1">
+      <div className="text-3xl font-bold text-white mt-1" role="status" aria-live="polite">
         {animate && typeof value === 'number' ? (
           <AnimatedNumber value={value} />
         ) : (

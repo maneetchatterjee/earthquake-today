@@ -1,4 +1,4 @@
-interface HealthScoreInput {
+export interface HealthScoreInput {
   earthquakeCount?: number;
   maxMagnitude?: number;
   avgAqi?: number;
