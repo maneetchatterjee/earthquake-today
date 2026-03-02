@@ -117,20 +117,20 @@ export default function EarthquakeTable({ features }: EarthquakeTableProps) {
           <thead>
             <tr className="bg-gray-900 text-gray-400 text-xs uppercase">
               <th
-                className="text-left px-4 py-3 cursor-pointer hover:text-white min-h-[44px] h-11"
+                className="text-left px-4 py-3 cursor-pointer hover:text-white h-11"
                 onClick={() => toggleSort('time')}
               >
                 Time <SortIcon k="time" />
               </th>
               <th
-                className="text-left px-4 py-3 cursor-pointer hover:text-white min-h-[44px] h-11"
+                className="text-left px-4 py-3 cursor-pointer hover:text-white h-11"
                 onClick={() => toggleSort('mag')}
               >
                 Mag <SortIcon k="mag" />
               </th>
               <th className="text-left px-4 py-3 h-11">Location</th>
               <th
-                className="text-left px-4 py-3 cursor-pointer hover:text-white min-h-[44px] h-11"
+                className="text-left px-4 py-3 cursor-pointer hover:text-white h-11"
                 onClick={() => toggleSort('depth')}
               >
                 Depth <SortIcon k="depth" />

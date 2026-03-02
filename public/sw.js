@@ -23,7 +23,7 @@ self.addEventListener('fetch', (event) => {
     );
   } else {
     event.respondWith(
-      caches.match(event.request).then((cached) => cached || fetch(event.request))
+      caches.match(event.request).then((cached) => cached || fetch(event.request).catch(() => cached))
     );
   }
 });

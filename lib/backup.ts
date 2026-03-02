@@ -1,5 +1,5 @@
 const BACKUP_KEY = 'earthmonitor_backup_v1';
-const INDIVIDUAL_KEYS = ['em-preferences', 'em-history', 'sidebar-collapsed'];
+const INDIVIDUAL_KEYS = ['earth-monitor-preferences', 'earth-monitor-history', 'sidebar-collapsed'];
 
 export function backupState(): void {
   try {
