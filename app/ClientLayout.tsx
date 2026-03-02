@@ -17,11 +17,8 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
     // RTL support for Arabic
     try {
-      const prefs = localStorage.getItem('em-preferences');
-      if (prefs) {
-        const parsed = JSON.parse(prefs) as { language?: string };
-        document.documentElement.dir = parsed.language === 'ar' ? 'rtl' : 'ltr';
-      }
+      const lang = localStorage.getItem('language');
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     } catch { /* ignore */ }
 
     // Register service worker

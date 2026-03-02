@@ -92,7 +92,7 @@ export function calculateRiskScore(priors: RiskPriors, observations: RiskObserva
     stormPosterior = priors.stormRate * likelihood;
   }
 
-  // Normalise and combine into 0-100 score
+  // Normalize and combine into 0-100 score
   const combined = (earthquakePosterior + aqiPosterior + wildfirePosterior + stormPosterior) / 4;
   return Math.max(0, Math.min(100, Math.round(combined * 100)));
 }
