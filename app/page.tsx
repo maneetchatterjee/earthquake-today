@@ -34,22 +34,22 @@ const LIVE_FEEDS = [
   {
     title: 'NOAA Live Weather Satellite',
     topic: 'Weather / Atmosphere',
-    embedUrl: 'https://www.youtube.com/embed/O9mYwRlucZY',
+    embedUrl: 'https://www.youtube.com/live/UDAZWxehMAI?si=ByDclPZKMUwGT5Sf',
   },
   {
     title: 'USGS Earthquake Briefing Stream',
     topic: 'Earthquakes',
-    embedUrl: 'https://www.youtube.com/embed/h3Yl8ec4f7Q',
+    embedUrl: 'https://www.youtube.com/live/rvtygG4n6ew?si=9D-GruN0rrfp1h95',
   },
   {
     title: 'NASA Earth & Space Live',
     topic: 'Earth Systems / Space',
-    embedUrl: 'https://www.youtube.com/embed/21X5lGlDOfg',
+    embedUrl: 'https://www.youtube.com/live/fO9e9jnhYK8?si=uIcyB-g4BTQ702mX',
   },
   {
     title: 'Global News Live (Environment)',
     topic: 'Breaking News',
-    embedUrl: 'https://www.youtube.com/embed/gCNeDWCI0vo',
+    embedUrl: 'https://www.youtube.com/live/ezp-7eLXBVs?si=5XzJ1J3ZUruqrc6b',
   },
 ];
 
