@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import 'leaflet/dist/leaflet.css';
 import { USGSFeature } from '@/lib/types';
 import { getMagnitudeRadius, getDepthColor, formatTimeAgo } from '@/lib/utils';
 
@@ -22,16 +23,11 @@ function getTileLayer(L: typeof import('leaflet'), isDark: boolean) {
 
 export default function EarthquakeMap({ features }: EarthquakeMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapInstanceRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const layerGroupRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const plateLayerRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const heatLayerRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const tileLayerRef = useRef<any>(null);
+  const mapInstanceRef = useRef<import('leaflet').Map | null>(null);
+  const layerGroupRef = useRef<import('leaflet').LayerGroup | null>(null);
+  const plateLayerRef = useRef<import('leaflet').GeoJSON | null>(null);
+  const heatLayerRef = useRef<import('leaflet').Layer | null>(null);
+  const tileLayerRef = useRef<import('leaflet').TileLayer | null>(null);
 
   const [showPlates, setShowPlates] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('markers');
@@ -57,8 +53,7 @@ export default function EarthquakeMap({ features }: EarthquakeMapProps) {
       layerGroupRef.current = L.layerGroup().addTo(map);
 
       // Add legend
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const legend = (L.control as any)({ position: 'bottomright' });
+      const legend = new L.Control({ position: 'bottomright' });
       legend.onAdd = () => {
         const div = L.DomUtil.create('div', 'leaflet-legend');
         div.style.cssText =
@@ -151,8 +146,7 @@ export default function EarthquakeMap({ features }: EarthquakeMapProps) {
             f.geometry.coordinates[0],
             Math.pow(10, f.properties.mag) / 1000,
           ]);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        heatLayerRef.current = (L as any).heatLayer(heatPoints, { radius: 25, blur: 15 }).addTo(mapInstanceRef.current);
+        heatLayerRef.current = (L as typeof L & { heatLayer: Function }).heatLayer(heatPoints, { radius: 25, blur: 15 }).addTo(mapInstanceRef.current);
       }
     });
   }, [features, viewMode]);

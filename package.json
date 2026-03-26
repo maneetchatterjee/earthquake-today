@@ -13,6 +13,7 @@
     "@fontsource/space-grotesk": "^5.2.10",
     "framer-motion": "^12.34.3",
     "globe.gl": "^2.45.0",
+    "isomorphic-dompurify": "^3.0.0",
     "leaflet": "^1.9.4",
     "leaflet.heat": "^0.2.0",
     "next": "16.1.6",
@@ -20,9 +21,11 @@
     "react-dom": "19.2.3",
     "react-gauge-component": "^2.0.26",
     "react-leaflet": "^5.0.0",
-    "recharts": "^3.7.0"
+    "recharts": "^3.7.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.1.6",
     "@tailwindcss/postcss": "^4",
     "@types/leaflet": "^1.9.21",
     "@types/leaflet.heat": "^0.2.5",

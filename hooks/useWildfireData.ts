@@ -3,10 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { WildfirePoint } from '@/lib/types';
 
 const REFRESH_INTERVAL = 1800000; // 30 minutes
-const FIRMS_API_KEY = process.env.NEXT_PUBLIC_FIRMS_MAP_KEY;
-const FIRMS_API_URL = FIRMS_API_KEY
-  ? `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${FIRMS_API_KEY}/VIIRS_SNPP_NRT/world/1`
-  : 'https://firms.modaps.eosdis.nasa.gov/data/active_fire/suomi-npp-viirs-c2/csv/SUOMI_VIIRS_C2_Global_24h.csv';
+const FIRMS_API_URL = '/api/firms';
 
 const MAX_FIRE_POINTS = 5000; // limit to avoid memory/render issues with large CSV datasets
 
@@ -37,7 +34,6 @@ export function useWildfireData() {
   const [fires, setFires] = useState<WildfirePoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [hasApiKey, setHasApiKey] = useState(!!FIRMS_API_KEY);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchFires = useCallback(async () => {
@@ -58,11 +54,10 @@ export function useWildfireData() {
   }, []);
 
   useEffect(() => {
-    setHasApiKey(!!FIRMS_API_KEY);
     fetchFires();
     const interval = setInterval(fetchFires, REFRESH_INTERVAL);
     return () => clearInterval(interval);
   }, [fetchFires]);
 
-  return { fires, loading, error, hasApiKey, lastUpdated };
+  return { fires, loading, error, hasApiKey: true, lastUpdated };
 }

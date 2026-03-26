@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
+import DynamicTitle from '@/components/DynamicTitle';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -13,6 +14,19 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       if (stored !== null) setCollapsed(stored === 'true');
     } catch (e) {
       console.warn('Could not read sidebar state from localStorage:', e);
+    }
+
+    // RTL support for Arabic
+    try {
+      const lang = localStorage.getItem('language');
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    } catch { /* ignore */ }
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch((err) => {
+        console.warn('Service worker registration failed:', err);
+      });
     }
   }, []);
 
@@ -28,6 +42,15 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   return (
     <div className="flex min-h-screen">
+      <DynamicTitle />
+      {/* Skip to content */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded focus-visible:ring-2"
+      >
+        Skip to content
+      </a>
+
       {/* Hamburger for mobile */}
       <button
         onClick={() => setMobileOpen(true)}
@@ -44,6 +67,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       />
 
       <main
+        id="main-content"
         className={`flex-1 transition-all duration-300 min-h-screen ${
           collapsed ? 'lg:ml-16' : 'lg:ml-64'
         }`}

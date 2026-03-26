@@ -9,6 +9,7 @@ import { useNewsData } from '@/hooks/useNewsData';
 import { calculateHealthScore } from '@/lib/healthScore';
 import RadialGauge from '@/components/ui/RadialGauge';
 import GlassCard from '@/components/ui/GlassCard';
+import AnimatedCounter from '@/components/ui/AnimatedCounter';
 import dynamic from 'next/dynamic';
 
 const EEWBanner = dynamic(() => import('@/components/EEWBanner'), { ssr: false });
@@ -107,6 +108,15 @@ export default function OverviewPage() {
     { label: 'Monitoring Since', value: '2024', unit: '', icon: '📡', color: '#00FFFF', href: '/records' },
   ];
 
+  const healthStatus =
+    healthScore >= 70
+      ? { label: 'Conditions Normal', tone: 'text-green-400 border-green-500/30 bg-green-500/20', icon: '✅' }
+      : healthScore >= 40
+        ? { label: 'Elevated Risk Signals', tone: 'text-amber-400 border-amber-500/30 bg-amber-500/20', icon: '⚠️' }
+        : { label: 'Critical Conditions', tone: 'text-red-400 border-red-500/30 bg-red-500/20', icon: '🚨' };
+
+  const topEarthquake = day[0];
+
   return (
     <div className="min-h-screen bg-[#0A0E1A] relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 opacity-70 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.24),transparent_34%),radial-gradient(circle_at_84%_12%,rgba(168,85,247,0.2),transparent_26%),radial-gradient(circle_at_50%_100%,rgba(16,185,129,0.16),transparent_32%)]" />
@@ -134,7 +144,7 @@ export default function OverviewPage() {
             <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
               <p className="text-xs text-slate-400">Strongest event</p>
               <p className="text-xl font-bold text-white mt-1">M{maxMag.toFixed(1)}</p>
-              <p className="text-xs text-slate-400 mt-1 truncate">{topEarthquake?.properties.place ?? 'No event data yet'}</p>
+              <p className="text-xs text-slate-400 mt-1 truncate">{featuredEarthquake?.properties.place ?? 'No event data yet'}</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
               <p className="text-xs text-slate-400">Latest headline</p>
@@ -149,19 +159,23 @@ export default function OverviewPage() {
 
         <GlassCard className="p-8 border border-white/15">
           <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="flex-shrink-0">
-              <RadialGauge
-                value={eqLoading ? 50 : healthScore}
-                min={0}
-                max={100}
-                label="Earth Health Score"
-                unit=""
-                colorScheme={[
-                  { limit: 33, color: '#FF3366' },
-                  { limit: 66, color: '#FFB800' },
-                  { color: '#00FF88' },
-                ]}
-              />
+            <div className="flex-shrink-0 min-h-[220px] min-w-[220px] flex items-center justify-center">
+              {isMounted ? (
+                <RadialGauge
+                  value={eqLoading ? 50 : healthScore}
+                  min={0}
+                  max={100}
+                  label="Earth Health Score"
+                  unit=""
+                  colorScheme={[
+                    { limit: 33, color: '#FF3366' },
+                    { limit: 66, color: '#FFB800' },
+                    { color: '#00FF88' },
+                  ]}
+                />
+              ) : (
+                <div className="h-[220px] w-[220px] rounded-full border border-white/10 bg-white/5 animate-pulse" aria-hidden />
+              )}
             </div>
             <div className="flex-1 w-full space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -215,8 +229,13 @@ export default function OverviewPage() {
             <Link key={stat.label} href={stat.href} className="group">
               <GlassCard className="p-4 cursor-pointer border border-white/5 group-hover:border-white/20 transition-all duration-200 group-hover:-translate-y-1">
                 <div className="text-2xl mb-2">{stat.icon}</div>
-                <div className="text-2xl font-bold font-mono" style={{ color: stat.color }}>
-                  {stat.value}{stat.unit}
+                <div className="text-2xl font-bold font-mono flex items-baseline gap-1" style={{ color: stat.color }}>
+                  {typeof stat.value === 'number' ? (
+                    <AnimatedCounter value={stat.value} decimals={stat.value % 1 !== 0 ? 1 : 0} />
+                  ) : (
+                    <span>{stat.value}</span>
+                  )}
+                  {stat.unit && <span className="text-sm">{stat.unit}</span>}
                 </div>
                 <div className="text-xs text-slate-400 mt-1">{stat.label}</div>
               </GlassCard>
@@ -237,6 +256,58 @@ export default function OverviewPage() {
             ))}
           </div>
         </div>
+
+
+        <GlassCard className="p-6 border border-white/10">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h3 className="text-white text-lg font-semibold">🎥 Live Earth Monitor Video Feeds</h3>
+            <span className="text-xs text-slate-400">Embedded live streams</span>
+          </div>
+          <div className="grid lg:grid-cols-2 gap-4">
+            {LIVE_FEEDS.map((feed) => (
+              <div key={feed.title} className="rounded-2xl border border-white/10 bg-black/30 overflow-hidden">
+                <div className="aspect-video">
+                  <iframe
+                    title={feed.title}
+                    src={feed.embedUrl}
+                    className="w-full h-full"
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                </div>
+                <div className="p-3">
+                  <p className="text-sm text-slate-100 font-medium">{feed.title}</p>
+                  <p className="text-xs text-slate-400 mt-1">{feed.topic}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </GlassCard>
+
+        <GlassCard className="p-6 border border-white/10">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h3 className="text-white text-lg font-semibold">📰 Live Topic News Desk</h3>
+            <Link href="/news" className="text-xs text-cyan-300 hover:text-cyan-200">Open full news feed →</Link>
+          </div>
+          {topicBuckets.length > 0 ? (
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-3">
+              {topicBuckets.map((bucket) => (
+                <div key={bucket.topic} className="rounded-xl border border-white/10 bg-white/5 p-3">
+                  <h4 className="text-sm font-semibold text-slate-100 mb-2">{bucket.topic}</h4>
+                  <ul className="space-y-2">
+                    {bucket.matches.map((headline) => (
+                      <li key={headline} className="text-xs text-slate-300 leading-relaxed">• {headline}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-sm text-slate-400">No topic-classified headlines available yet. Check back after the next news refresh.</div>
+          )}
+        </GlassCard>
 
         <GlassCard className="p-6">
           <div className="flex items-center justify-between gap-3 mb-4">

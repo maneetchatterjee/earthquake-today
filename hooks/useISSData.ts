@@ -30,7 +30,7 @@ export function useISSData(): ISSData {
 
   const fetchPosition = useCallback(async () => {
     try {
-      const res = await fetch('https://api.open-notify.org/iss-now.json');
+      const res = await fetch('/api/iss?endpoint=position');
       const data = await res.json();
       if (data.iss_position) {
         setPosition({
@@ -48,7 +48,7 @@ export function useISSData(): ISSData {
 
   const fetchAstronauts = useCallback(async () => {
     try {
-      const res = await fetch('https://api.open-notify.org/astros.json');
+      const res = await fetch('/api/iss?endpoint=astros');
       const data = await res.json();
       if (data.people) {
         setAstronauts(data.people);

@@ -31,7 +31,7 @@ export function useFlightData(): FlightData {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('https://opensky-network.org/api/states/all');
+      const res = await fetch('/api/flights');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       const rawStates = data.states || [];
