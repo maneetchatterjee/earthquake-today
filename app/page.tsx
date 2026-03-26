@@ -10,6 +10,7 @@ import { useNewsData } from '@/hooks/useNewsData';
 import { calculateHealthScore } from '@/lib/healthScore';
 import RadialGauge from '@/components/ui/RadialGauge';
 import GlassCard from '@/components/ui/GlassCard';
+import AnimatedCounter from '@/components/ui/AnimatedCounter';
 import dynamic from 'next/dynamic';
 
 const EEWBanner = dynamic(() => import('@/components/EEWBanner'), { ssr: false });
@@ -280,8 +281,13 @@ export default function OverviewPage() {
             <Link key={stat.label} href={stat.href} className="group">
               <GlassCard className="p-4 cursor-pointer border border-white/5 group-hover:border-white/20 transition-all duration-200 group-hover:-translate-y-1">
                 <div className="text-2xl mb-2">{stat.icon}</div>
-                <div className="text-2xl font-bold font-mono" style={{ color: stat.color }}>
-                  {stat.value}{stat.unit}
+                <div className="text-2xl font-bold font-mono flex items-baseline gap-1" style={{ color: stat.color }}>
+                  {typeof stat.value === 'number' ? (
+                    <AnimatedCounter value={stat.value} decimals={stat.value % 1 !== 0 ? 1 : 0} />
+                  ) : (
+                    <span>{stat.value}</span>
+                  )}
+                  {stat.unit && <span className="text-sm">{stat.unit}</span>}
                 </div>
                 <div className="text-xs text-slate-400 mt-1">{stat.label}</div>
               </GlassCard>

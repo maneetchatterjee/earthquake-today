@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
+import DynamicTitle from '@/components/DynamicTitle';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
@@ -41,6 +42,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   return (
     <div className="flex min-h-screen">
+      <DynamicTitle />
       {/* Skip to content */}
       <a
         href="#main-content"
