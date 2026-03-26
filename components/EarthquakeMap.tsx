@@ -24,7 +24,7 @@ function getTileLayer(L: typeof import('leaflet'), isDark: boolean) {
 export default function EarthquakeMap({ features }: EarthquakeMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<import('leaflet').Map | null>(null);
-  const layerGroupRef = useRef<import('leaflet').LayerGroup | null>(null);
+  const layerGroupRef = useRef<import('leaflet').FeatureGroup | null>(null);
   const plateLayerRef = useRef<import('leaflet').GeoJSON | null>(null);
   const heatLayerRef = useRef<import('leaflet').Layer | null>(null);
   const tileLayerRef = useRef<import('leaflet').TileLayer | null>(null);
@@ -50,7 +50,7 @@ export default function EarthquakeMap({ features }: EarthquakeMapProps) {
       tile.addTo(map);
       tileLayerRef.current = tile;
       mapInstanceRef.current = map;
-      layerGroupRef.current = L.layerGroup().addTo(map);
+      layerGroupRef.current = L.featureGroup().addTo(map);
 
       // Add legend
       const legend = new L.Control({ position: 'bottomright' });
@@ -75,12 +75,14 @@ export default function EarthquakeMap({ features }: EarthquakeMapProps) {
       const observer = new MutationObserver(() => {
         if (!mapInstanceRef.current) return;
         import('leaflet').then((Lm) => {
-          if (tileLayerRef.current) {
+          if (tileLayerRef.current && mapInstanceRef.current) {
             mapInstanceRef.current.removeLayer(tileLayerRef.current);
           }
           const newDark = document.documentElement.classList.contains('dark');
           tileLayerRef.current = getTileLayer(Lm, newDark);
-          tileLayerRef.current.addTo(mapInstanceRef.current);
+          if (mapInstanceRef.current) {
+            tileLayerRef.current.addTo(mapInstanceRef.current);
+          }
           if (layerGroupRef.current) layerGroupRef.current.bringToFront();
           if (plateLayerRef.current) plateLayerRef.current.bringToFront();
         });
@@ -126,12 +128,14 @@ export default function EarthquakeMap({ features }: EarthquakeMapProps) {
             </div>
           `);
 
-          circle.addTo(layerGroupRef.current);
+          if (layerGroupRef.current) {
+            circle.addTo(layerGroupRef.current);
+          }
         });
       }
 
       // Update heatmap
-      if (heatLayerRef.current) {
+      if (heatLayerRef.current && mapInstanceRef.current) {
         mapInstanceRef.current.removeLayer(heatLayerRef.current);
         heatLayerRef.current = null;
       }
@@ -164,7 +168,9 @@ export default function EarthquakeMap({ features }: EarthquakeMapProps) {
           plateLayerRef.current = L.geoJSON(data, {
             style: { color: '#f97316', weight: 2, opacity: 0.6 },
           });
-          plateLayerRef.current.addTo(mapInstanceRef.current);
+          if (mapInstanceRef.current) {
+            plateLayerRef.current.addTo(mapInstanceRef.current);
+          }
           if (layerGroupRef.current) {
             layerGroupRef.current.bringToFront();
           }
@@ -172,7 +178,7 @@ export default function EarthquakeMap({ features }: EarthquakeMapProps) {
           // silently fail
         }
       } else {
-        if (plateLayerRef.current) {
+        if (plateLayerRef.current && mapInstanceRef.current) {
           mapInstanceRef.current.removeLayer(plateLayerRef.current);
           plateLayerRef.current = null;
         }

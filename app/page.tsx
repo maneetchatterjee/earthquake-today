@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useEarthquakeData } from '@/hooks/useEarthquakeData';
 import { useWeatherData } from '@/hooks/useWeatherData';
@@ -29,6 +30,47 @@ const MODULE_LINKS = [
   { icon: '🏆', label: 'Records', href: '/records', color: '#EAB308' },
 ];
 
+const LIVE_FEEDS = [
+  {
+    title: 'NOAA Live Weather Satellite',
+    topic: 'Weather / Atmosphere',
+    embedUrl: 'https://www.youtube.com/live/UDAZWxehMAI?si=ByDclPZKMUwGT5Sf',
+  },
+  {
+    title: 'USGS Earthquake Briefing Stream',
+    topic: 'Earthquakes',
+    embedUrl: 'https://www.youtube.com/live/rvtygG4n6ew?si=9D-GruN0rrfp1h95',
+  },
+  {
+    title: 'NASA Earth & Space Live',
+    topic: 'Earth Systems / Space',
+    embedUrl: 'https://www.youtube.com/live/fO9e9jnhYK8?si=uIcyB-g4BTQ702mX',
+  },
+  {
+    title: 'Global News Live (Environment)',
+    topic: 'Breaking News',
+    embedUrl: 'https://www.youtube.com/live/ezp-7eLXBVs?si=5XzJ1J3ZUruqrc6b',
+  },
+];
+
+const TOPIC_KEYWORDS: Record<string, string[]> = {
+  Earthquakes: ['earthquake', 'seismic', 'tsunami', 'fault'],
+  Weather: ['weather', 'storm', 'cyclone', 'hurricane', 'flood'],
+  Climate: ['climate', 'warming', 'carbon', 'emission', 'temperature'],
+  Wildfires: ['wildfire', 'fire', 'smoke', 'burn'],
+  Oceans: ['ocean', 'marine', 'sea', 'coastal'],
+};
+
+function toTopicBuckets(titles: string[]) {
+  return Object.entries(TOPIC_KEYWORDS).map(([topic, keywords]) => ({
+    topic,
+    matches: titles.filter((title) => {
+      const lower = title.toLowerCase();
+      return keywords.some((keyword) => lower.includes(keyword));
+    }).slice(0, 3),
+  })).filter((bucket) => bucket.matches.length > 0);
+}
+
 function getScoreBreakdown(earthquakeCount: number, maxMagnitude: number, avgAqi: number, avgTemp: number, fireCount: number) {
   const earthquakeVolumePenalty = Math.min(20, earthquakeCount * 0.05);
   const magnitudePenalty = maxMagnitude > 5 ? Math.min(10, (maxMagnitude - 5) * 3) : 0;
@@ -51,6 +93,14 @@ export default function OverviewPage() {
   const { aqiData, lastUpdated: aqiUpdated } = useAirQualityData();
   const { fires, lastUpdated: fireUpdated, error: wildfireError } = useWildfireData();
   const { articles, lastUpdated: newsUpdated } = useNewsData();
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const topicBuckets = toTopicBuckets(articles.map((article) => article.title));
 
   const maxMag = day.reduce((max, f) => Math.max(max, f.properties.mag || 0), 0);
   const avgAqi = aqiData.length ? Math.round(aqiData.reduce((s, d) => s + d.usAqi, 0) / aqiData.length) : 50;
@@ -95,7 +145,7 @@ export default function OverviewPage() {
         ? { label: 'Elevated Risk Signals', tone: 'text-amber-400 border-amber-500/30 bg-amber-500/20', icon: '⚠️' }
         : { label: 'Critical Conditions', tone: 'text-red-400 border-red-500/30 bg-red-500/20', icon: '🚨' };
 
-  const topEarthquake = day[0];
+  const featuredEarthquake = day[0];
 
   const stats = [
     { label: 'Earthquakes Today', value: day.length, unit: '', icon: '🌋', color: '#FF3366', href: '/earthquakes' },
